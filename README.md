@@ -61,10 +61,10 @@ Variable | Meaning | Type
 
 Being `t` the time, the DAG will look like this:
 
-<img src="pics/dag.png" width="500">
+<img src="pics/dag.png" width="500" style = "text-align:center">
 
 Based on the definitions of the variables in the above table, the causal DAG with the weights will look like this:
-<img src="pics/dagWeighted.png" width="500">
+<img src="pics/dagWeighted.png" width="500" style = "text-align:center">
 
 ### 3.3 Infected Cumulative Distance
 
@@ -72,7 +72,7 @@ What does the infected cumulative distance (`I`) mean? Agents will be interactin
 
 The infected cumulative distance `I` for each agent `i` at each time point `t` will be defined as:
 
-<img src="pics/interaction.png" width="500">
+<img src="pics/interaction.png" width="500" style = "text-align:center">
 
 [Equation 1]
 ![equation1](https://latex.codecogs.com/gif.latex?I%5Et_i%20%3D%20%5Csum_%7Bj%3D1%7D%5E%7Bn-1%7D%5Cfrac%7BY%5Et_j%7D%7BD%5Et_%7Bi%2Cj%7D%7D)
@@ -81,7 +81,7 @@ The Infected Cumulative Distance `I` was defined as the distance `D` per agent `
 
 Let's see a hypothetical example for `agent_1` for time zero (`time = 0`)
 
-<img src="pics/interaction1.png" width="500">
+<img src="pics/interaction1.png" width="500" style = "text-align:center">
 
 and in this concrete example, considering `Y` as either `1` or `0`, for `agent_1` in time zero:
 
@@ -89,7 +89,7 @@ and in this concrete example, considering `Y` as either `1` or `0`, for `agent_1
 
 What about the `agent_6` at time one (`time = 1`)?
 
-<img src="pics/interaction6.png" width="500">
+<img src="pics/interaction6.png" width="500" style = "text-align:center">
 
 The infected cumulative distance for the `agent_6` at time `1` will be defined as:
 
@@ -97,7 +97,11 @@ The infected cumulative distance for the `agent_6` at time `1` will be defined a
 
 We can also think about the Infected Cumulative Distance `I` in a similar way to a forward propagation of a neural net where the value that reaches each node of the next layer is `I^t_j` per agent `j` and time `t` as defined in __[Equation 1]__.
 
-<img src="pics/net.png" width="500">
+<img src="pics/net.png" width="1000" style = "text-align:center">
+
+And the collection of all Infected Cumulative Distances `I` could be represented as a variable as we did in the DAG:
+
+<img src="pics/dag.png" width="500" style = "text-align:center">
 
 ### 3.4 Probability of getting the vaccine
 The probability of getting the vaccine is just going to depend on the sex (`Z`), a time-independent variable:
