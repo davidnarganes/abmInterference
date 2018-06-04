@@ -2,7 +2,7 @@
 ## 1. General description of the project
 This repository will contain the code for generating (`Java`) and analysing (`R programming language`) a simple multi-Agent Based Model (mABM) of patients in a 2D continuous space. The idea is to simulate the contagion of a disease thought a population: human papilloma virus (HPV).
 
-__Note__: This `.java` project could be run by creating a project using your favourite Integrated Development Environment (IDE) and cloning this repository. This simulation relies on the `Mason` java library and its dependencies. Please ensure that these are added as libraries to the project. The link to `Mason` dependencies is the following: https://cs.gmu.edu/~eclab/projects/mason/
+__Note__: This `.java` project could be run by creating a project using your favourite Integrated Development Environment (IDE) and cloning this repository. This simulation relies on the `Mason` java library and its dependencies: already included in the repository. If there are any problems, the link to `Mason` dependencies is the following: https://cs.gmu.edu/~eclab/projects/mason/
 
 ### 1.1 Learning objectives of the intern
  - Learn Java programming while creating an ABM
@@ -13,7 +13,7 @@ __Note__: This `.java` project could be run by creating a project using your fav
  - Integrate the spatial dimension with time-dependent confounders
  - Violate the Stable Unit Treatment Value Assumption (SUTVA) of causal inference
 
-Why this integration? ABM are used to simulate individuals and the consequences of interactions and their behaviours. Nevertheless, the accuracy of this simulations is highly reliant on capturing the complexity of the relationships between individuals over spactio-temporal scenarios. Current methodologies lack the sophistication to capture causal relationships. By integrating ABM and causal inference;:
+Why this integration? ABM are used to simulate individuals and the consequences of interactions and their behaviours. Nevertheless, the accuracy of this simulations is highly reliant on capturing the complexity of the relationships between individuals over spatio-temporal scenarios. Current methodologies lack the sophistication to capture causal relationships. By integrating ABM and causal inference:
  - more complex and accurate simulations could be implemented
  - better understanding about how populations react to interventions
  
@@ -21,25 +21,27 @@ Why the violation of SUTVA? SUTVA states that:
   - Individuals do not interfere with each other (this is the strength of AMBs)
   - Treatment assignment of one unit does not affect outcome of another unit
   
-In this example, the effectiveness of vaccination in HPV prevention will depend on how many people were vaccinated and how they interact. Individuals, in this case agents, will interfere with each other and this will be reflected with the Euclidean distance between them. Also, the vaccination of one unit or agent will reduce the transmission effect.
+In this example, the effectiveness of vaccination in HPV prevention will depend on how many people were vaccinated and how they interact. Individuals, in this case agents, will interfere with each other and this will be reflected with the Euclidean distance between them. Also, the vaccination of one unit or agent will reduce the contagion effect.
 
-__Note__: This simulation is not going to be 100% realistic, it will be an example of how to integrate causal inference and ABMs.
+__Note!__: This simulation is not going to be 100% realistic, it will be an example of how to integrate causal inference and ABMs.
 
 ## 2 Human Papilloma Virus (HPV)
 ### 2.1 HPV description
 __HPV__ is the most common sexually transmitted infection. Most HPV infections cause no symptoms and resolve spontaneously. Nevertheless, it increases the risk of cancer of the cervix, vulva, vagina, penis, anus, mouth, or throat.
 
-__Risk factors__ include sexual intercourse,multiple partners, smoking, and poor immune system. HPV is typically transmitted by sustained direct skin-to-skin contact.
+__Risk factors__ include sexual intercourse, multiple partners, smoking, and poor immune system. HPV is typically transmitted by sustained direct skin-to-skin contact.
 
 ### 2.2 HPV transmission
 Once the HPV infects a person, an active infection occurs and the virus can be transmitted. Several months to years may elapse before the visible symptoms can be clinically detected in the form of intraepithelial lesions, making it difficult to know which partner was the source of infection.
 
 ### 2.3 HPV prevention
-HPV vaccines can prevent the most common types of infection. In women, HPV infection can cause cervix cancer and women are more likely to get vaccinated with Gardasil, preventing around 90% of infections. Nevertheless, vaccination is less common in men (here it comes our confounder).
+HPV vaccines can prevent the most common types of infection. In women, HPV infection can cause cervix cancer and women are more likely to get vaccinated with Gardasil, preventing around 90% of infections. Nevertheless, vaccination is less common in men (here it comes our __confounder__: sex).
+Also, 
 
 ## 3. Directed Acyclic Graph (DAG) and causal description
 
-In this example, there will be a simple confounder `Z`, sex, that conditions both the outcome `Y`, infection, and the vaccine status `X`. Vaccine status `X` and outcome `Y` are time-dependent variables whereas `Z` is going to be time-invariant.
+In this example, there will be a confounder `Z`, sex, that conditions both the outcome `Y`, infection, and the vaccine status `X`. Vaccine status `X` and outcome `Y` are time-dependent variables whereas `Z` is going to be time-invariant.
+The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
 
 ### 3.1 Variables
 
@@ -49,40 +51,53 @@ Variable | Meaning | Type
 `X` | Has received vaccination? | Boolean
 `Y`| Is infected? | Boolean
 `I`| Infected cumulative distance | Double
-`c`| Causal weight of `Z` in `Y` or confounding | Double
-`s`| Causal weight of `Z` in `X` | Double
-`w`| Causal weight of `X` in `Y` | Double
-`t`| Causal weight of `I` in `Y` or transmission power or weight | Double
+`a`| Causal weight of `Z` in `X` | Double
+`b`| Causal weight of `Z` in `Y` | Double
+`c`| Causal weight of `X` in `Y` | Double
+`d`| Causal weight of `I` in `X` or concern weight | Double
+`e`| Causal weight of `I` in `Y` or contagion weight | Double
 
-### 3.2 Causal Diagram
+### 3.2 Causal DAG and causal net
 
-The DAG will look like this:
+Being `t` the time, the DAG will look like this:
 
-<img src="pics/DAG_CI_ABM_v1.png" width="500">
+<img src="pics/dag.png" width="500">
+
+Based on the definitions of the variables in the above table, the causal DAG with the weights will look like this:
+<img src="pics/dagWeighted.png" width="500">
 
 ### 3.3 Infected Cumulative Distance
 
-What does the infected cumulative distance (`I`) mean? 
+What does the infected cumulative distance (`I`) mean? Agents will be interacting with each other and the probability of interaction will be a simple function of their proximity:
 
-![equation1](https://latex.codecogs.com/gif.latex?I%5Et_i%20%3D%20%5Csum%5E%7Bn-1%7D_%7Bj%3D1%7DD%5Et_%7Bi%2Cj%7DY%5Et_j)
+The infected cumulative distance `I` for each agent `i` at each time point `t` will be defined as:
+
+<img src="pics/interaction.png" width="500">
+
+[Equation 1]
+![equation1](https://latex.codecogs.com/gif.latex?I%5Et_i%20%3D%20%5Csum_%7Bj%3D1%7D%5E%7Bn-1%7D%5Cfrac%7BY%5Et_j%7D%7BD%5Et_%7Bi%2Cj%7D%7D)
 
 The Infected Cumulative Distance `I` was defined as the distance `D` per agent `i` at each time `t` with regards to each other (`n-1`) agent `j` without considering itself and depending on the outcome `Y` of each agent `j`.
 
 Let's see a hypothetical example for `agent_1` for time zero (`time = 0`)
 
-<img src="pics/cumulative_distance1.png" width="500">
+<img src="pics/interaction1.png" width="500">
 
 and in this concrete example, considering `Y` as either `1` or `0`, for `agent_1` in time zero:
 
-![equation2](https://latex.codecogs.com/gif.latex?I%5E0_%7B1%7D%20%3D%20D%5E0_%7B1%2C2%7DY%5E0_2%20&plus;%20D%5E0_%7B1%2C4%7DY%5E0_4%20%3D%20D%5E0_%7B1%2C2%7D%20&plus;%20D%5E0_%7B1%2C4%7D)
+![equation2](https://latex.codecogs.com/gif.latex?I%5E0_1%20%3D%20%5Cfrac%7BY%5E0_2%7D%7BD%5E0_%7B1%2C2%7D%7D%20&plus;%20%5Cfrac%7BY%5E0_7%7D%7BD%5E0_%7B1%2C7%7D%7D)
 
-What about the `agent_3` at time or step one (`time = 1`)?
+What about the `agent_6` at time one (`time = 1`)?
 
-<img src="pics/cumulative_distance_3.png" width="500">
+<img src="pics/interaction6.png" width="500">
 
-The infected cumulative distance for the `agent_3` at time or step `1` will be defined as:
+The infected cumulative distance for the `agent_6` at time `1` will be defined as:
 
-![equation3](https://latex.codecogs.com/gif.latex?I%5E1_%7B3%7D%20%3D%20D%5E1_%7B3%2C2%7DY%5E1_2%20&plus;%20D%5E1_%7B3%2C4%7DY%5E1_4%20%3D%20D%5E1_%7B3%2C2%7D%20&plus;%20D%5E1_%7B3%2C4%7D)
+![equation3](https://latex.codecogs.com/gif.latex?I%5E1_6%20%3D%20%5Cfrac%7BY%5E1_2%7D%7BD%5E1_%7B6%2C2%7D%7D%20&plus;%20%5Cfrac%7BY%5E1_7%7D%7BD%5E1_%7B6%2C7%7D%7D)
+
+We can also think about the Infected Cumulative Distance `I` in a similar way to a forward propagation of a neural net where the value that reaches each node of the next layer is `I^t_j` per agent `j` and time `t` as defined in __[Equation 1]__.
+
+<img src="pics/net.png" width="500">
 
 ### 3.4 Probability of getting the vaccine
 The probability of getting the vaccine is just going to depend on the sex (`Z`), a time-independent variable:
