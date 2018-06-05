@@ -1,6 +1,10 @@
 # ABM_CausalInf and HPV
+=======================
+
 ## 1. General description of the project
-This repository will contain the code for generating (`Java`) and analysing (`R programming language`) a simple multi-Agent Based Model (mABM) of patients in a 2D continuous space. The idea is to simulate the contagion of a disease thought a population: human papilloma virus (HPV).
+________________________________________
+
+This repository will contain the code for generating (`Java`) and analysing (`R programming language`) a simple multi-Agent Based Model (mABM) of patients in a 2D continuous space. The idea is to simulate (i) causal diagrams for interference, (ii) ABMs, and the contagion of a disease thought a population: human papilloma virus (HPV).
 
 __Note__: This `.java` project could be run by creating a project using your favourite Integrated Development Environment (IDE) and cloning this repository. This simulation relies on the `Mason` java library and its dependencies: already included in the repository. If there are any problems, the link to `Mason` dependencies is the following: https://cs.gmu.edu/~eclab/projects/mason/
 
@@ -20,8 +24,18 @@ Why this integration? ABM are used to simulate individuals and the consequences 
 Why the violation of SUTVA? SUTVA states that:
   - Individuals do not interfere with each other (this is the strength of AMBs)
   - Treatment assignment of one unit does not affect outcome of another unit
+
+### 1.3 Interference introduction
+This piece of research will be based on:
+
+- E. L. Ogburn and T. J. VanDerWeele:
+  "Causal Diagrams for Interference" Statistical Science, Vol. 29, No. 4, Special Issua on Semiparametrics and Causal Inference (November 2014), pp. 559-578 at https://www.jstor.org/stable/43288499.
+  Accessed: 02-06-2018
+
+Traditionally, causal inference relied on the assumption of no interference: one individual's exposure may affect another individual's outcome. SUTVA is violated when the outcome is an infectious disease and treating one individual may exert a protective effect on others in a given population.
+=======================
   
-In this example, the effectiveness of vaccination in HPV prevention will depend on how many people were vaccinated and how they interact. Individuals, in this case agents, will interfere with each other and this will be reflected with the Euclidean distance between them. Also, the vaccination of one unit or agent will reduce the contagion effect.
+In this example, the effectiveness of vaccination in HPV prevention will depend on how many people were vaccinated and how they interact. Individuals, in this case agents, will interfere with each other. Also, the vaccination of one individual, in our case agent, will reduce the contagion effect. This description will be formally expressed in mathematical terms and DAGs in the following sections.
 
 __Note!__: This simulation is not going to be 100% realistic, it will be an example of how to integrate causal inference and ABMs.
 
@@ -35,27 +49,37 @@ __Risk factors__ include sexual intercourse, multiple partners, smoking, and poo
 Once the HPV infects a person, an active infection occurs and the virus can be transmitted. Several months to years may elapse before the visible symptoms can be clinically detected in the form of intraepithelial lesions, making it difficult to know which partner was the source of infection.
 
 ### 2.3 HPV prevention
-HPV vaccines can prevent the most common types of infection. In women, HPV infection can cause cervix cancer and women are more likely to get vaccinated with Gardasil, preventing around 90% of infections. Nevertheless, vaccination is less common in men (here it comes our __confounder__: sex).
+HPV vaccines can prevent the most common types of infection. In women, HPV infection can cause cervix cancer and women are more likely to get vaccinated with Gardasil, preventing around 90% of infections. Nevertheless, vaccination is less common in men (here it comes our simple confounder: sex).
 Also, 
 
-## 3. Directed Acyclic Graph (DAG) and causal description
+## 3. Directed Acyclic Graph (DAG) and causal description of the project
+### 3.1 DAG definition and properties
+Causal diagrams, or causal directed acyclic graphs (DAGs) consist of nodes, representing the variables in a study, and arrows, representing direct causal effects. A path on a DAG is any unbroken, non-repeating sequence of arrows connecting one variable to another.
+ - DAGs are directed because there is a unique path that follows arrows from tail to head.
+ - DAGs are acyclic because they do not contemplate the existance of loops of arrows that converge in the same variable the first arrow emanated from.
+Reference for more information about DAGs: [include]
 
-In this example, there will be a confounder `Z`, sex, that conditions both the outcome `Y`, infection, and the vaccine status `X`. Vaccine status `X` and outcome `Y` are time-dependent variables whereas `Z` is going to be time-invariant.
+### 3.2 General description
+In this example we wish to estimate the average causal effect of a vaccine `A` on an outcome `Y`, infection, from simulation data on `n` individuals for whom we have also measured a vector of confounders `C`, the sex of the agents. For simplicity , we assume that both `A` and `Y` are binary.
+
+Under the assumption of single version of treatment, `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, subject `i` had received treatment `a`. Then, the average causal effect of `A` on `Y` is equal to: [include]
+
+The conditional exchangeability assumption is often referred to as the "no unmeasured confounding assumption".
+
 The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
 
-### 3.1 Variables
+### 3.3 Variables
 
 Variable | Meaning | Type
 --- | --- | ---
-`Z`| Sex of the agent | Boolean
-`X` | Has received vaccination? | Boolean
+`C`| Sex of the agent | Boolean
+`A` | Has received vaccination? | Boolean
 `Y`| Is infected? | Boolean
-`I`| Infected cumulative distance | Double
+`I`| Interference of contagion, or Inverse cumulative distance of infected | Double
 `a`| Causal weight of `Z` in `X` | Double
 `b`| Causal weight of `Z` in `Y` | Double
 `c`| Causal weight of `X` in `Y` | Double
-`d`| Causal weight of `I` in `X` or concern weight | Double
-`e`| Causal weight of `I` in `Y` or contagion weight | Double
+`d`| Causal weight of `I` in `Y` or contagion weight | Double
 
 ### 3.2 Causal DAG and causal net
 
