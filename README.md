@@ -61,15 +61,25 @@ Following the description from Ogburn and VanderWeele (2014), it is often reason
 
 Furthermore, we wish to estimate the average causal effect of a vaccine `A` on an outcome `Y`, infection, from simulation data on `n` individuals for whom we have also measured a vector of confounders `C`, the sex of the agents. For simplicity , we assume that both `A` and `Y` are binary.
 
-Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment for agents at a given time `t`. Let `Y ≡ (Y_1,...,Y_n)` and `C ≡ (C_1,...,C_n)` be the vector of autcomes and array of covariates, respectively, for `n` agents at given time `t`. Define `Y_i(a)` to be the conterfactual outcome we would have observed for agent `i` under an intervention that set `A` to `a`.
+Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment under the assumption of single version of treatment for agents at a given time `t`. Let `Y ≡ (Y_1,...,Y_n)` and `C ≡ (C_1,...,C_n)` be the vector of autcomes and array of covariates, respectively, for `n` agents at given time `t`. Define `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, agent `i` had received treatment `a`, this is, if we would have observed for agent `i` under an intervention that set `A` to `a`.
 
 We define the consistency assumption based on Ogburn and VanderWeele (2014) as:
+
 (1)
-![equation1](https://latex.codecogs.com/gif.latex?Y_i%28a%29%3DY_i)
+![equation1.0](https://latex.codecogs.com/gif.latex?Y_i%28a%29%3DY_i)
 when
 ![equation1.1](https://latex.codecogs.com/gif.latex?A%3Da)
 
-Under the assumption of single version of treatment, `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, subject `i` had received treatment `a`. Then, the average causal effect of `A` on `Y` is equal to: [include]
+The exchangeability assumption, also known as the "no unmeasured confounding assumption" to account for the causal effects under interference: we assume that we have measured a set of prevaccination covariates `C` for each agent such that:
+
+(2)
+![equation2.0](https://latex.codecogs.com/gif.latex?Y_i%28a%29%5Ccoprod%20A%7CC)
+
+and the positivity assumption:
+
+(3)
+![equation3.0](https://latex.codecogs.com/gif.latex?P%28A%3Da%7CC%3Dc%29%3E0)
+for all `a` in support of `A` and all `c` in support of `C`
 
 The conditional exchangeability assumption is often referred to as the "no unmeasured confounding assumption".
 
