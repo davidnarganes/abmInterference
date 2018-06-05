@@ -1,9 +1,7 @@
 # ABM_CausalInf and HPV
-=======================
+_______________________
 
 ## 1. General description of the project
-________________________________________
-
 This repository will contain the code for generating (`Java`) and analysing (`R programming language`) a simple multi-Agent Based Model (mABM) of patients in a 2D continuous space. The idea is to simulate (i) causal diagrams for interference, (ii) ABMs, and the contagion of a disease thought a population: human papilloma virus (HPV).
 
 __Note__: This `.java` project could be run by creating a project using your favourite Integrated Development Environment (IDE) and cloning this repository. This simulation relies on the `Mason` java library and its dependencies: already included in the repository. If there are any problems, the link to `Mason` dependencies is the following: https://cs.gmu.edu/~eclab/projects/mason/
@@ -29,11 +27,10 @@ Why the violation of SUTVA? SUTVA states that:
 This piece of research will be based on:
 
 - E. L. Ogburn and T. J. VanDerWeele:
-  "Causal Diagrams for Interference" Statistical Science, Vol. 29, No. 4, Special Issua on Semiparametrics and Causal Inference (November 2014), pp. 559-578 at https://www.jstor.org/stable/43288499.
+  "Causal Diagrams for Interference" Statistical Science, Vol. 29, No. 4, Special Issues on Semiparametrics and Causal Inference (November 2014), pp. 559-578 at https://www.jstor.org/stable/43288499.
   Accessed: 02-06-2018
 
 Traditionally, causal inference relied on the assumption of no interference: one individual's exposure may affect another individual's outcome. SUTVA is violated when the outcome is an infectious disease and treating one individual may exert a protective effect on others in a given population.
-=======================
   
 In this example, the effectiveness of vaccination in HPV prevention will depend on how many people were vaccinated and how they interact. Individuals, in this case agents, will interfere with each other. Also, the vaccination of one individual, in our case agent, will reduce the contagion effect. This description will be formally expressed in mathematical terms and DAGs in the following sections.
 
@@ -59,8 +56,18 @@ Causal diagrams, or causal directed acyclic graphs (DAGs) consist of nodes, repr
  - DAGs are acyclic because they do not contemplate the existance of loops of arrows that converge in the same variable the first arrow emanated from.
 Reference for more information about DAGs: [include]
 
-### 3.2 General description
-In this example we wish to estimate the average causal effect of a vaccine `A` on an outcome `Y`, infection, from simulation data on `n` individuals for whom we have also measured a vector of confounders `C`, the sex of the agents. For simplicity , we assume that both `A` and `Y` are binary.
+### 3.2 Causal description
+Following the description from Ogburn and VanderWeele (2014), it is often reasonable to make a "partial interference" assumption where interference can only occur within subgroups or "blocks" of agents that are separated in time and/or space. The conterfactual notation for interference will follow Hudgens and Halloran (2008): suppose than `n` individual fall into `N` blocks, indexed by `k` with `m = n/N` individuals in each block. In this example, we will assume `N = 1` so that interference may occur between any two agens in the population: a full interference with no blocks.
+
+Furthermore, we wish to estimate the average causal effect of a vaccine `A` on an outcome `Y`, infection, from simulation data on `n` individuals for whom we have also measured a vector of confounders `C`, the sex of the agents. For simplicity , we assume that both `A` and `Y` are binary.
+
+Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment for agents at a given time `t`. Let `Y ≡ (Y_1,...,Y_n)` and `C ≡ (C_1,...,C_n)` be the vector of autcomes and array of covariates, respectively, for `n` agents at given time `t`. Define `Y_i(a)` to be the conterfactual outcome we would have observed for agent `i` under an intervention that set `A` to `a`.
+
+We define the consistency assumption based on Ogburn and VanderWeele (2014) as:
+(1)
+![equation1](https://latex.codecogs.com/gif.latex?Y_i%28a%29%3DY_i)
+when
+![equation1.1](https://latex.codecogs.com/gif.latex?A%3Da)
 
 Under the assumption of single version of treatment, `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, subject `i` had received treatment `a`. Then, the average causal effect of `A` on `Y` is equal to: [include]
 
@@ -181,3 +188,11 @@ Variable | Meaning | Type
 `central_force`| Joining force to keep agents in the center of the 2D space | Double
 `randomness`| Weight that control the force that makes the agents wander randomly | Double
 `promiscuity`| Probability of changing Friends and Strangers | Double
+
+### References
+1. E. L. Ogburn and T. J. VanDerWeele:
+   "Causal Diagrams for Interference" Statistical Science, Vol. 29, No. 4, Special Issues on Semiparametrics and Causal Inference (November 2014), pp. 559-578 at https://www.jstor.org/stable/43288499.
+  Accessed: 02-06-2018
+2. M. G. Hudgens and M. E. Halloran:
+   "Towards Causal Inference with Interference" Journal of the American Statistical Association. 2008, June; 103 (482): pp. 832-842 at https://amstat.tandfonline.com/doi/abs/10.1198/016214508000000292#.WxaoRRzTWGA
+   Accessed: 02-06-2018
