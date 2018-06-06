@@ -65,49 +65,41 @@ Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment under the assu
 
 The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `A` to `Y` on the DAG. The effect of `Ai` on `Yj` will be represented as a indirect, mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a function of the evolution of the outcome of agent `i`. This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y%5ET_i) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows representtimes through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
 
-We define the consistency assumption based on Ogburn and VanderWeele (2014) as:
+We define the __consistency assumption__ based on Ogburn and VanderWeele (2014) as:
 
-(Equation 1)
 ![](https://latex.codecogs.com/gif.latex?Y_i%28a%29%3DY_i)
 when
 ![](https://latex.codecogs.com/gif.latex?A%3Da)
 
-The exchangeability assumption, also known as the "no unmeasured confounding assumption" to account for the causal effects under interference: we assume that we have measured a set of prevaccination covariates `C` for each agent such that:
+The __exchangeability assumption__, also known as the "no unmeasured confounding assumption" to account for the causal effects under interference: we assume that we have measured a set of prevaccination covariates `C` for each agent such that:
 
-(Equation 2)
 ![](https://latex.codecogs.com/gif.latex?Y_i%28a%29%5Ccoprod%20A%7CC)
 
-and the positivity assumption:
+and the __positivity assumption__:
 
-(Equation 3)
 ![](https://latex.codecogs.com/gif.latex?P%28A%3Da%7CC%3Dc%29%3E0)
 
 for all `a` in support of `A` and all `c` in support of `C`
 
-The overall effect (OE) of intervention `a` compared to intervention `a'` on subject `i` is defined as ![](https://latex.codecogs.com/gif.latex?%5Cinline%20OE_i%20%28a%2Ca%27%29%20%3D%20E%5BY_i%28a%29%5D%29%20-%20E%5BY_i%28a%27%29%5D) where `i` indicates that the expectations do not average over individuals and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5En%20E%5BY_i%28a%29%5D) averages over the empirical mean of the conterfactual outcomes at time `t`.
+The __overall effect__ (OE) of intervention `a` compared to intervention `a'` on subject `i` is defined as:
 
-The unit level effect of treatment of agent `i` fixes the treatment assignments for all agents expect for agent `i`, and compares the conterfactual outcomes for agent `i` under two different treatment assignments.
+![](https://latex.codecogs.com/gif.latex?%5Cinline%20OE_i%20%28a%2Ca%27%29%20%3D%20E%5BY_i%28a%29%5D%29%20-%20E%5BY_i%28a%27%29%5D)
 
-Let ![](https://latex.codecogs.com/gif.latex?%5Cinline%20a_%7B-1%7D) be a vector of length `n-1` of treatment values for all agents in the simulation except for agent `i`. Then, the unit effect will be defined as:
+where `i` indicates that the expectations do not average over individuals and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5En%20E%5BY_i%28a%29%5D) averages over the empirical mean of the conterfactual outcomes at time `t`.
 
-(Equation 4) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20UE_i%28%5Cmathbf%7Ba%7D%3B%20%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%3DE%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29%5D-E%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Cbar%7Ba%7D%29%5D)
+The __unit level effect__ (UE) of treatment of agent `i` fixes the treatment assignments for all agents expect for agent `i`, and compares the conterfactual outcomes for agent `i` under two different treatment assignments. Let ![](https://latex.codecogs.com/gif.latex?%5Cinline%20a_%7B-1%7D) be a vector of length `n-1` of treatment values for all agents in the simulation except for agent `i`, where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29) 
+represents the agent's `i` counterfactual outcome under the intervention in which all agents except for agent `i` receive treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D_%7B-1%7D) 
+and agent `i` receives treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Ctilde%7Ba%7D). Then, the UE will be defined as:
 
-where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29) 
-represents the agent's `i` counterfactual outcome under the intervention in which all agents except for agent `i` receive treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D_%7B-1%7D) and agent `i` receives treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Ctilde%7Ba%7D).
+![](https://latex.codecogs.com/gif.latex?%5Cinline%20UE_i%28%5Cmathbf%7Ba%7D%3B%20%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%3DE%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29%5D-E%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Cbar%7Ba%7D%29%5D)
 
-The spillover effect (SE) of intervention ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D) compared to intervention ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%27%7D) on agent `i` fixes `i`s treatment level and compares its conterfactual outcomes under two different interventions.
+The __spillover effect__ (SE) of intervention ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D) compared to intervention ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%27%7D) on agent `i` fixes `i`s treatment level and compares its conterfactual outcomes under two different interventions. The SE will be defined as:
 
-The average unit effect (UE) is :
+![](https://latex.codecogs.com/svg.latex?SE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%29%20%3D%20%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba%27_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D)
 
-(Equation 5) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20UE%28%5Cmathbf%7Ba%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Cbar%7Ba%7D%29%5D)
+and the __total effect__ can be decomposed into a sum of unit level and spillover effects:
 
-and the average spillover effect (SE) is:
-
-(Equation 6) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20SE%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%29%20%3D%20E%5BY%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba%27_%7B-%7D%7D%2C%5Cbar%7Ba%7D%29%5D)
-
-and the average total effect can be decomposed into a sum of unit level and spillover effects:
-
-(Equation 7) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20TE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Cbar%7Ba%7D%29%5D&plus;E%5BY_i%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba%27_%7B-%7D%7D%2C%5Cbar%7Ba%7D%29%5D).
+(Equation 7) ![](https://latex.codecogs.com/svg.latex?TE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Cbar%7Ba%7D%29%5D&plus;E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba%27_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D).
 
 The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
 
