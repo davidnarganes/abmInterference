@@ -65,6 +65,8 @@ Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment under the assu
 
 The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `A` to `Y` on the DAG. The effect of `Ai` on `Yj` will be represented as a indirect, mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a function of the evolution of the outcome of agent `i`. This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y%5ET_i) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows representtimes through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
 
+### 3.3 Causal assumptions
+
 We define the __consistency assumption__ based on Ogburn and VanderWeele (2014) as:
 
 ![](https://latex.codecogs.com/gif.latex?Y_i%28a%29%3DY_i)
@@ -80,6 +82,8 @@ and the __positivity assumption__:
 ![](https://latex.codecogs.com/gif.latex?P%28A%3Da%7CC%3Dc%29%3E0)
 
 for all `a` in support of `A` and all `c` in support of `C`
+
+### 3.4 Definition of causal effects
 
 The __overall effect__ (OE) of intervention `a` compared to intervention `a'` on subject `i` is defined as:
 
@@ -99,7 +103,7 @@ The __spillover effect__ (SE) of intervention ![](https://latex.codecogs.com/gif
 
 and the __total effect__ can be decomposed into a sum of unit level and spillover effects:
 
-(Equation 7) ![](https://latex.codecogs.com/svg.latex?TE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Cbar%7Ba%7D%29%5D&plus;E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba%27_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D).
+![](https://latex.codecogs.com/svg.latex?TE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Cbar%7Ba%7D%29%5D&plus;E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba%27_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D).
 
 The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
 
