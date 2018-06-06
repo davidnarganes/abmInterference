@@ -70,25 +70,25 @@ We define the consistency assumption based on Ogburn and VanderWeele (2014) as:
 (1)
 ![](https://latex.codecogs.com/gif.latex?Y_i%28a%29%3DY_i)
 when
-![equation1.1](https://latex.codecogs.com/gif.latex?A%3Da)
+![](https://latex.codecogs.com/gif.latex?A%3Da)
 
 The exchangeability assumption, also known as the "no unmeasured confounding assumption" to account for the causal effects under interference: we assume that we have measured a set of prevaccination covariates `C` for each agent such that:
 
 (2)
-![equation2.0](https://latex.codecogs.com/gif.latex?Y_i%28a%29%5Ccoprod%20A%7CC)
+![](https://latex.codecogs.com/gif.latex?Y_i%28a%29%5Ccoprod%20A%7CC)
 
 and the positivity assumption:
 
 (3)
-![equation3.0](https://latex.codecogs.com/gif.latex?P%28A%3Da%7CC%3Dc%29%3E0)
+![](https://latex.codecogs.com/gif.latex?P%28A%3Da%7CC%3Dc%29%3E0)
 
 for all `a` in support of `A` and all `c` in support of `C`
 
-The overall effect (OE) of intervention `a` compared to intervention `a'` on subject `i` is defined as ![equation4.0](https://latex.codecogs.com/gif.latex?%5Cinline%20OE_i%20%28a%2Ca%27%29%20%3D%20E%5BY_i%28a%29%5D%29%20-%20E%5BY_i%28a%27%29%5D) where `i` indicates that the expectations do not average over individuals and ![equation5.0](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5En%20E%5BY_i%28a%29%5D) averages over the empirical mean of the conterfactual outcomes at time `t`.
+The overall effect (OE) of intervention `a` compared to intervention `a'` on subject `i` is defined as ![](https://latex.codecogs.com/gif.latex?%5Cinline%20OE_i%20%28a%2Ca%27%29%20%3D%20E%5BY_i%28a%29%5D%29%20-%20E%5BY_i%28a%27%29%5D) where `i` indicates that the expectations do not average over individuals and ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi%3D1%7D%5En%20E%5BY_i%28a%29%5D) averages over the empirical mean of the conterfactual outcomes at time `t`.
 
 The unit level effect of treatment of agent `i` fixes the treatment assignments for all agents expect for agent `i`, and compares the conterfactual outcomes for agent `i` under two different treatment assignments.
 
-Let ![equation5.0](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7By%7D_%7B-1%7D) be a vector of length `n-1` of outcome values for all agents in the simulation except for agent `i`
+Let ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7By%7D_%7B-1%7D) be a vector of length `n-1` of outcome values for all agents in the simulation except for agent `i`
 
 The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
 
