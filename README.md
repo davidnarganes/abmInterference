@@ -72,7 +72,9 @@ Variable | Meaning | Type
 `c`| Causal weight of `A` in `Y` | Double
 `d`| Causal weight of `f(Y)` in `Y` or contagion weight | Double
 
-The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `Ai` to `Yi` on the DAG. The effect of `Ai` on `Yj` will be represented as a mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a distance function `f(Y)` of the evolution of the outcome of agent `i`. This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/svg.latex?%5Cinline%20Y%5Et_%7Bi%7D) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows represent times through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
+The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `Ai` to `Yi` on the DAG. The effect of `Ai` on `Yj` will be represented as a mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a distance function `f(Y)` of the evolution of the outcome of agent `i`. This assumption is represented in Figure 1 where ![](https://latex.codecogs.com/svg.latex?%5Cinline%20Y%5Et_%7Bi%7D) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows represent times through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
+
+<img src="pics/expandedDag.png" width="1000">
 
 `f(Y)` will be a vector comprised by the values of distance function of the vector of outcomes ![](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BY%7D_%7B-%7D) where the subindex `-` can be indexed by `-i` representing all agents expect for `i`, `D` represents the indexed distance `D` between each agent `-i` excluding `i`  to `i` (Figure 1) at the time `T = t`. `f(Y)` was defined at time `T` as:
 
@@ -124,14 +126,14 @@ and the __total effect__ can be decomposed into a sum of unit level and spillove
 
 ![](https://latex.codecogs.com/svg.latex?TE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Cbar%7Ba%7D%29%5D&plus;E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba%27_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D).
 
-### 3.6 Probability of getting the vaccine
+### 3.6 Posterior probability of getting the vaccine
 The posterior probability of getting the vaccine is just going to depend on the confounder sex (`C`), a time-independent variable, and the prior probability of getting the vaccine:
 
 ![](https://latex.codecogs.com/svg.latex?%5Cinline%20A%3D%281&plus;aC%29P_%7Bprior%7D%28A%29)
 
 [I have to put this formula in proper mathematical terms!]
 
-### 3.5 Probability of getting infected
+### 3.5 Posterior probability of getting infected
 The posterior probability of infection `Y` at time `T = t` will depend on the confounder sex (`C`), the vaccination status (`A`), and the function of the outcome (`f(Y)`):
 
 ![](https://latex.codecogs.com/svg.latex?%5Cinline%20Y%3D%281&plus;bC-cA&plus;f%28Y%29d%29P_%7Bprior%7D%28Y%29)
