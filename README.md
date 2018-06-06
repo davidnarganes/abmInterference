@@ -92,7 +92,22 @@ Let ![](https://latex.codecogs.com/gif.latex?%5Cinline%20a_%7B-1%7D) be a vector
 
 (Equation 4) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20UE_i%28%5Cmathbf%7Ba%7D%3B%20%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%3DE%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29%5D-E%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Cbar%7Ba%7D%29%5D)
 
-where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29) represents the agent's `i` counterfactual outcome under the intervention in which all agents except for agent `i` receive treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D_%7B-1%7D) and agent `i` receives treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Ctilde%7Ba%7D).
+where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29) 
+represents the agent's `i` counterfactual outcome under the intervention in which all agents except for agent `i` receive treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D_%7B-1%7D) and agent `i` receives treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Ctilde%7Ba%7D).
+
+The spillover effect (SE) of intervention ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D) compared to intervention ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%27%7D) on agent `i` fixes `i`s treatment level and compares its conterfactual outcomes under two different interventions.
+
+The average unit effect (UE) is :
+
+(Equation 5) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20UE%28%5Cmathbf%7Ba%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Cbar%7Ba%7D%29%5D)
+
+and the average spillover effect (SE) is:
+
+(Equation 6) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20SE%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%29%20%3D%20E%5BY%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba%27_%7B-%7D%7D%2C%5Cbar%7Ba%7D%29%5D)
+
+and the average total effect can be decomposed into a sum of unit level and spillover effects:
+
+(Equation 7) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20TE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Cbar%7Ba%7D%29%5D&plus;E%5BY_i%28%5Cmathbf%7Ba_%7B-%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba%27_%7B-%7D%7D%2C%5Cbar%7Ba%7D%29%5D).
 
 The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
 
