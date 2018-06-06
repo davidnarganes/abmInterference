@@ -59,11 +59,19 @@ Reference for more information about DAGs: [include]
 ### 3.2 Causal description
 Following the description from Ogburn and VanderWeele (2014), it is often reasonable to make a "partial interference" assumption where interference can only occur within subgroups or "blocks" of agents that are separated in time and/or space. The conterfactual notation for interference will follow Hudgens and Halloran (2008): suppose than `n` individual fall into `N` blocks, indexed by `k` with `m = n/N` individuals in each block. In this example, we will assume `N = 1` so that interference may occur between any two agens in the population: a full interference with no blocks.
 
-Furthermore, we wish to estimate the average causal effect of a vaccine `A` on an outcome `Y`, infection, from simulation data on `n` individuals for whom we have also measured a vector of confounders `C`, the sex of the agents. For simplicity , we assume that both `A` and `Y` are binary.
+Furthermore, we wish to estimate the average causal effect of a vaccine `A` on an outcome `Y`, infection, from simulation data on `n` individuals for whom we have also measured a vector of confounders `C`, the sex of the agents. For simplicity , we assume that both `A` and `Y` are dichotomous, binary variables.
 
 Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment under the assumption of single version of treatment for agents at a given time `t`. Let `Y ≡ (Y_1,...,Y_n)` and `C ≡ (C_1,...,C_n)` be the vector of autcomes and array of covariates, respectively, for `n` agents at given time `t`. Define `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, agent `i` had received treatment `a`, this is, if we would have observed for agent `i` under an intervention that set `A` to `a`.
 
-The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `A` to `Y` on the DAG. The effect of `Ai` on `Yj` will be represented as a indirect, mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a function of the evolution of the outcome of agent `i`. This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y%5ET_i) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows representtimes through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
+The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `Ai` to `Yi` on the DAG. The effect of `Ai` on `Yj` will be represented as a mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a distance function `f(Y)` of the evolution of the outcome of agent `i`. This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y%5ET_i) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows representtimes through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
+
+`f(Y)` will be a vector comprised by the values of distance function of the vector of outcomes ![](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BY%7D_%7B-%7D) where the subindex `-` can be indexed by `-i` representing all agents expect for `i`, `D` represents the indexed distance `D` between each agent `-i` excluding `i` (Figure 1) at the time `T = t`. `f(Y)` was defined at time `T` as:
+
+![](https://latex.codecogs.com/svg.latex?f%28%5Cmathbf%7BY%7D%5Et%29%5Et_i%3D%20%5Csum_%7B-i%20%3D%201%7D%5E%7Bn-1%7D%20%5Cfrac%7BY_%7B-i%7D%5Et%7D%7BD%5Et_%7Bi%2C-i%7D%7D)
+
+<img src="pics/interaction.png" width="500" style = "text-align:center">
+
+Figure 1. Distance between `n = 6` agents at time `T = t`.
 
 ### 3.3 Causal assumptions
 
