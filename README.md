@@ -37,17 +37,13 @@ In this example, the effectiveness of vaccination in HPV prevention will depend 
 __Note!__: This simulation is not going to be 100% realistic, it will be an example of how to integrate causal inference and ABMs.
 
 ## 2 Human Papilloma Virus (HPV)
-### 2.1 HPV description
 __HPV__ is the most common sexually transmitted infection. Most HPV infections cause no symptoms and resolve spontaneously. Nevertheless, it increases the risk of cancer of the cervix, vulva, vagina, penis, anus, mouth, or throat.
 
 __Risk factors__ include sexual intercourse, multiple partners, smoking, and poor immune system. HPV is typically transmitted by sustained direct skin-to-skin contact.
 
-### 2.2 HPV transmission
 Once the HPV infects a person, an active infection occurs and the virus can be transmitted. Several months to years may elapse before the visible symptoms can be clinically detected in the form of intraepithelial lesions, making it difficult to know which partner was the source of infection.
 
-### 2.3 HPV prevention
 HPV vaccines can prevent the most common types of infection. In women, HPV infection can cause cervix cancer and women are more likely to get vaccinated with Gardasil, preventing around 90% of infections. Nevertheless, vaccination is less common in men (here it comes our simple confounder: sex).
-Also, 
 
 ## 3. Directed Acyclic Graph (DAG) and causal description of the project
 ### 3.1 DAG definition and properties
@@ -61,17 +57,30 @@ Following the description from Ogburn and VanderWeele (2014), it is often reason
 
 Furthermore, we wish to estimate the average causal effect of a vaccine `A` on an outcome `Y`, infection, from simulation data on `n` individuals for whom we have also measured a vector of confounders `C`, the sex of the agents. For simplicity , we assume that both `A` and `Y` are dichotomous, binary variables.
 
-Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment under the assumption of single version of treatment for agents at a given time `t`. Let `Y ≡ (Y_1,...,Y_n)` and `C ≡ (C_1,...,C_n)` be the vector of autcomes and array of covariates, respectively, for `n` agents at given time `t`. Define `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, agent `i` had received treatment `a`, this is, if we would have observed for agent `i` under an intervention that set `A` to `a`.
+Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment under the assumption of single version of treatment for agents at a given time `t`. Let `Y ≡ (Y_1,...,Y_n)` be the vector of outcomes, let `C ≡ (C_1,...,C_n)` be the array of covariates, and let `f(Y) ≡ (f(Y)_1,...,f(Y)_n)` be the vector of a distance function of the outcome for `n` agents at given time `T = t`. Define `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, agent `i` had received treatment `a`, this is, if we would have observed for agent `i` under an intervention that set `A` to `a`.
+
+Table 1. Variables of the DAG
+
+Variable | Meaning | Type
+--- | --- | ---
+`C`| Sex of the agent | Boolean
+`A` | Has received vaccination? | Boolean
+`Y`| Is infected? | Boolean
+`f(Y)`| Interference of contagion, or inverse cumulative distance of infected | Double
+`a`| Causal weight of `Z` in `X` | Double
+`b`| Causal weight of `Z` in `Y` | Double
+`c`| Causal weight of `X` in `Y` | Double
+`d`| Causal weight of `f(Y)` in `Y` or contagion weight | Double
 
 The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `Ai` to `Yi` on the DAG. The effect of `Ai` on `Yj` will be represented as a mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a distance function `f(Y)` of the evolution of the outcome of agent `i`. This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y%5ET_i) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows representtimes through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
 
-`f(Y)` will be a vector comprised by the values of distance function of the vector of outcomes ![](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BY%7D_%7B-%7D) where the subindex `-` can be indexed by `-i` representing all agents expect for `i`, `D` represents the indexed distance `D` between each agent `-i` excluding `i` (Figure 1) at the time `T = t`. `f(Y)` was defined at time `T` as:
+`f(Y)` will be a vector comprised by the values of distance function of the vector of outcomes ![](https://latex.codecogs.com/svg.latex?%5Cmathbf%7BY%7D_%7B-%7D) where the subindex `-` can be indexed by `-i` representing all agents expect for `i`, `D` represents the indexed distance `D` between each agent `-i` excluding `i`  to `i` (Figure 1) at the time `T = t`. `f(Y)` was defined at time `T` as:
 
 ![](https://latex.codecogs.com/svg.latex?f%28%5Cmathbf%7BY%7D%5Et%29%5Et_i%3D%20%5Csum_%7B-i%20%3D%201%7D%5E%7Bn-1%7D%20%5Cfrac%7BY_%7B-i%7D%5Et%7D%7BD%5Et_%7Bi%2C-i%7D%7D)
 
 <img src="pics/interaction.png" width="500" style = "text-align:center">
 
-Figure 1. Distance between `n = 6` agents at time `T = t`.
+Figure 1. Distance between `n = 6` agents at time `T = t`. __THE INDEX IS WRONG:CHANGE__
 
 ### 3.3 Causal assumptions
 
@@ -113,68 +122,7 @@ and the __total effect__ can be decomposed into a sum of unit level and spillove
 
 ![](https://latex.codecogs.com/svg.latex?TE_i%28%5Cmathbf%7Ba%7D%2C%5Cmathbf%7Ba%27%7D%3B%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%20%3D%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Cbar%7Ba%7D%29%5D&plus;E%5BY_i%28%5Cmathbf%7Ba_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D%20-%20E%5BY%28%5Cmathbf%7Ba%27_%7B-i%7D%7D%2C%5Ctilde%7Ba%7D%29%5D).
 
-The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
-
-### 3.3 Variables
-
-Variable | Meaning | Type
---- | --- | ---
-`C`| Sex of the agent | Boolean
-`A` | Has received vaccination? | Boolean
-`Y`| Is infected? | Boolean
-`I`| Interference of contagion, or Inverse cumulative distance of infected | Double
-`a`| Causal weight of `Z` in `X` | Double
-`b`| Causal weight of `Z` in `Y` | Double
-`c`| Causal weight of `X` in `Y` | Double
-`d`| Causal weight of `I` in `Y` or contagion weight | Double
-
-### 3.2 Causal DAG and causal net
-
-Being `t` the time, the DAG will look like this:
-
-<img src="pics/dag.png" width="500" style = "text-align:center">
-
-Based on the definitions of the variables in the above table, the causal DAG with the weights will look like this:
-<img src="pics/dagWeighted.png" width="500" style = "text-align:center">
-
-### 3.3 Infected Cumulative Distance
-
-What does the infected cumulative distance (`I`) mean? Agents will be interacting with each other and the probability of interaction will be a simple function of their proximity:
-
-The infected cumulative distance `I` for each agent `i` at each time point `t` will be defined as:
-
-<img src="pics/interaction.png" width="500" style = "text-align:center">
-
-[Equation 1]
-![equation1](https://latex.codecogs.com/gif.latex?I%5Et_i%20%3D%20%5Csum_%7Bj%3D1%7D%5E%7Bn-1%7D%5Cfrac%7BY%5Et_j%7D%7BD%5Et_%7Bi%2Cj%7D%7D)
-
-The Infected Cumulative Distance `I` was defined as the distance `D` per agent `i` at each time `t` with regards to each other (`n-1`) agent `j` without considering itself and depending on the outcome `Y` of each agent `j`.
-
-Let's see a hypothetical example for `agent_1` for time zero (`time = 0`)
-
-<img src="pics/interaction1.png" width="500" style = "text-align:center">
-
-and in this concrete example, considering `Y` as either `1` or `0`, for `agent_1` in time zero:
-
-![equation2](https://latex.codecogs.com/gif.latex?I%5E0_1%20%3D%20%5Cfrac%7BY%5E0_2%7D%7BD%5E0_%7B1%2C2%7D%7D%20&plus;%20%5Cfrac%7BY%5E0_7%7D%7BD%5E0_%7B1%2C7%7D%7D)
-
-What about the `agent_6` at time one (`time = 1`)?
-
-<img src="pics/interaction6.png" width="500" style = "text-align:center">
-
-The infected cumulative distance for the `agent_6` at time `1` will be defined as:
-
-![equation3](https://latex.codecogs.com/gif.latex?I%5E1_6%20%3D%20%5Cfrac%7BY%5E1_2%7D%7BD%5E1_%7B6%2C2%7D%7D%20&plus;%20%5Cfrac%7BY%5E1_7%7D%7BD%5E1_%7B6%2C7%7D%7D)
-
-We can also think about the Infected Cumulative Distance `I` in a similar way to a forward propagation of a neural net where the value that reaches each node of the next layer is `I^t_j` per agent `j` and time `t` as defined in __[Equation 1]__.
-
-<img src="pics/net.png" width="1000" style = "text-align:center">
-
-And the collection of all Infected Cumulative Distances `I` could be represented as a variable as we did in the DAG:
-
-<img src="pics/dag.png" width="500" style = "text-align:center">
-
-### 3.4 Probability of getting the vaccine
+### 3.6 Probability of getting the vaccine
 The probability of getting the vaccine is just going to depend on the sex (`Z`), a time-independent variable:
 
 ![equation4](https://latex.codecogs.com/gif.latex?P%28X%2CZ%29%20%3D%20P%28X%7CZ%29P%28Z%29)
@@ -184,7 +132,7 @@ and `P(X,Z)` is going to depend on the confounding weight and the baseline (can 
 ![equation5](https://latex.codecogs.com/gif.latex?X%20%3D%20%281%20&plus;%20cZ%29P_%7Bbaseline%7D%28X%29)
 
 ### 3.5 Probability of getting infected
-Based on the DAG, the probability of getting infected `Y` at time `n` will depend on the agent's sex (`Z`), the vaccination status (`X`), and the infected cumulative distance (`I`):
+Based on the DAG, the probability of getting infected `Y` at time `T = t` will depend on the agent's sex (`C`), the vaccination status (`A`), and the function of the outcome (`f(Y)`):
 
 ![equation6](https://latex.codecogs.com/gif.latex?P%28Y_%7Bn%7D%2CX_%7Bn%7D%2CZ_%7Bn%7D%2CI_%7Bn-1%7D%2CY_%7Bn-1%7D%29%20%3D%20P%28Y_%7Bn%7D%7CX_%7Bn%7D%2CZ_%7Bn%7D%2CI_%7Bn-1%7D%29P%28X_%7Bn%7D%7CZ_%7Bn%7D%29P%28I_%7Bn-1%7D%7CY_%7Bn-1%7D%29P%28Y_%7Bn-1%7D%29)
 
