@@ -63,23 +63,23 @@ Furthermore, we wish to estimate the average causal effect of a vaccine `A` on a
 
 Let `A ≡ (A_1,...,A_n)` be the vector of vaccination assignment under the assumption of single version of treatment for agents at a given time `t`. Let `Y ≡ (Y_1,...,Y_n)` and `C ≡ (C_1,...,C_n)` be the vector of autcomes and array of covariates, respectively, for `n` agents at given time `t`. Define `Yi(a),a = 0,1` is defined as the counterfactual outcome we would have observed if, contrary to the fact, agent `i` had received treatment `a`, this is, if we would have observed for agent `i` under an intervention that set `A` to `a`.
 
-The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `A` to `Y` on the DAG. The effect of `Ai` on `Yj` will be represented as a indirect, mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a function of the evolution of the outcome of agent `i` (Equation 1). This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y%5ET_i) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows representtimes through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
+The causal structure of the effect of of `Ai` in `Yi` is straightforward: `Ai` has a direct protective effect on `Yi`, represented by a direct arrow from `A` to `Y` on the DAG. The effect of `Ai` on `Yj` will be represented as a indirect, mediated effect through `Yi` and a function of the latter `f(Yi)`. But this cannot be correct since `Yi` and `Yj` are contemporaneous and therefore one cannot cause the other. Instead, the effect of `Ai` on `Yj` will be mediated though a function of the evolution of the outcome of agent `i`. This assumption is represented in __FIGURE ADD__ where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y%5ET_i) represents the outcome of individual `i` at time `t`. `T` is the time of the end of the simulation. The dashed arrows representtimes through `4` to `T-1` which do not fit in the DAG (but which are observed in the simulation).
 
 We define the consistency assumption based on Ogburn and VanderWeele (2014) as:
 
-(1)
+(Equation 1)
 ![](https://latex.codecogs.com/gif.latex?Y_i%28a%29%3DY_i)
 when
 ![](https://latex.codecogs.com/gif.latex?A%3Da)
 
 The exchangeability assumption, also known as the "no unmeasured confounding assumption" to account for the causal effects under interference: we assume that we have measured a set of prevaccination covariates `C` for each agent such that:
 
-(2)
+(Equation 2)
 ![](https://latex.codecogs.com/gif.latex?Y_i%28a%29%5Ccoprod%20A%7CC)
 
 and the positivity assumption:
 
-(3)
+(Equation 3)
 ![](https://latex.codecogs.com/gif.latex?P%28A%3Da%7CC%3Dc%29%3E0)
 
 for all `a` in support of `A` and all `c` in support of `C`
@@ -88,7 +88,11 @@ The overall effect (OE) of intervention `a` compared to intervention `a'` on sub
 
 The unit level effect of treatment of agent `i` fixes the treatment assignments for all agents expect for agent `i`, and compares the conterfactual outcomes for agent `i` under two different treatment assignments.
 
-Let ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7By%7D_%7B-1%7D) be a vector of length `n-1` of outcome values for all agents in the simulation except for agent `i`
+Let ![](https://latex.codecogs.com/gif.latex?%5Cinline%20a_%7B-1%7D) be a vector of length `n-1` of treatment values for all agents in the simulation except for agent `i`. Then, the unit effect will be defined as:
+
+(Equation 4) ![](https://latex.codecogs.com/gif.latex?%5Cinline%20UE_i%28%5Cmathbf%7Ba%7D%3B%20%5Ctilde%7Ba%7D%2C%5Cbar%7Ba%7D%29%3DE%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29%5D-E%5BY_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Cbar%7Ba%7D%29%5D)
+
+where ![](https://latex.codecogs.com/gif.latex?%5Cinline%20Y_i%28%5Cmathbf%7Ba%7D_%7B-i%7D%2C%5Ctilde%7Ba%7D%29%29) represents the agent's `i` counterfactual outcome under the intervention in which all agents except for agent `i` receive treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Cmathbf%7Ba%7D_%7B-1%7D) and agent `i` receives treatment ![](https://latex.codecogs.com/gif.latex?%5Cinline%20%5Ctilde%7Ba%7D).
 
 The variable that captures the interaction among patients `I` will also be a confounder, conditioning both vaccination `X` and the outcome `Y`.
 
