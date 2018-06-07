@@ -1,12 +1,12 @@
 <component name="libraryTable">
   <library name="libraries">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/resources/libraries/itext-1.2.jar!/" />
-      <root url="jar://$PROJECT_DIR$/resources/libraries/jfreechart-1.0.17.jar!/" />
-      <root url="jar://$PROJECT_DIR$/resources/libraries/bsh-2.0b4.jar!/" />
-      <root url="jar://$PROJECT_DIR$/resources/libraries/jcommon-1.0.21.jar!/" />
-      <root url="jar://$PROJECT_DIR$/resources/libraries/portfolio.jar!/" />
       <root url="jar://$PROJECT_DIR$/resources/libraries/jmf.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/libraries/bsh-2.0b4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/libraries/jfreechart-1.0.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/libraries/portfolio.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/libraries/jcommon-1.0.21.jar!/" />
+      <root url="jar://$PROJECT_DIR$/resources/libraries/itext-1.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

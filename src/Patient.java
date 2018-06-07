@@ -228,7 +228,7 @@ public class Patient implements Steppable {
             if(current.getInfected() && current != this){
                 Double2D one = city.yard.getObjectLocation(this);
                 Double2D other = city.yard.getObjectLocation(current);
-                cumulativeVector += 1/distance(one,other);
+                cumulativeVector += (1 - 0.5 * current.getAllTreatment())/distance(one,other);
             }
         }
         setCumulativeDistance(cumulativeVector);

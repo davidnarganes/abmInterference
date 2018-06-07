@@ -46,6 +46,7 @@ public class City extends SimState{
     private double maxForce = 20.0;
     private double forceCenter = 0.0005;
     private double randomMultiplier = 10.0;
+    private double infectiousnessEffect = 0.5;
     private Scanner inputStream;
     private int lines = 0;
     private boolean multiSIM = true;
@@ -185,8 +186,18 @@ public class City extends SimState{
         randomMultiplier = value;
     }
     public Object domRandomMultiplier()
+
     {
         return new Interval(0.0,20.0);
+    }
+    public double getInfectiousnessEffect(){
+        return infectiousnessEffect;
+    }
+    public void setInfectiousnessEffect(double value){
+        infectiousnessEffect = value;
+    }
+    public Object domInfectiousnessEffect(){
+        return new Interval(0.0,1.0);
     }
 
     // GETTER SETTER LINES
