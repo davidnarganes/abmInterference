@@ -49,10 +49,11 @@ public class Utils implements Steppable {
 
         String filename = (city.getProbInfected() + "_" +
                 city.getProbVaccine() + "_" +
-                city.getTransmissionEffect() + "_" +
-                city.getSexOverVaccine() + "_" +
-                city.getSexOverInfection() + "_" +
-                city.getVaccineOverInfection() + "_" +
+                city.getContagion() + "_" +
+                city.getInfectiousness() + "_" +
+                city.getSexOnInfection() + "_" +
+                city.getSexOnVaccine() + "_" +
+                city.getVaccineOnInfection() + "_" +
                 city.getPromiscuityPopulation() + "_" +
                 city.getNumPatients() +
                 ".txt");
@@ -68,10 +69,10 @@ public class Utils implements Steppable {
                     "utf-8"));
             writer.write("probInfected:" + city.getProbInfected() + ","  +
                     "probVaccine:" + city.getProbVaccine() + ","  +
-                    "transmissionEffect:" + city.getTransmissionEffect() + ","  +
-                    "sexOverVaccine:" + city.getSexOverVaccine() + ","  +
-                    "sexOverInfection:" + city.getSexOverInfection() + ","  +
-                    "vaccineOverInfection:" + city.getVaccineOverInfection() + ","  +
+                    "contagion:" + city.getContagion() + ","  +
+                    "sexOnInfection:" + city.getSexOnInfection() + ","  +
+                    "sexOnVaccine:" + city.getSexOnVaccine() + ","  +
+                    "vaccineOnInfection:" + city.getVaccineOnInfection() + ","  +
                     "promiscuityPopulation:" + city.getPromiscuityPopulation() + ","  +
                     "numPatients:" + city.getNumPatients()
 
@@ -102,10 +103,11 @@ public class Utils implements Steppable {
 
         String filename = (city.getProbInfected() + "_" +
                 city.getProbVaccine() + "_" +
-                city.getTransmissionEffect() + "_" +
-                city.getSexOverVaccine() + "_" +
-                city.getSexOverInfection() + "_" +
-                city.getVaccineOverInfection() + "_" +
+                city.getContagion() + "_" +
+                city.getInfectiousness() + "_" +
+                city.getSexOnInfection() + "_" +
+                city.getSexOnVaccine() + "_" +
+                city.getVaccineOnInfection() + "_" +
                 city.getPromiscuityPopulation() + "_" +
                 city.getNumPatients() +
                 ".txt");
@@ -125,7 +127,7 @@ public class Utils implements Steppable {
                 writer.write(step +
                         "," + patient.getName() +
                         "," + patient.getSex() +
-                        "," + patient.getTreatment() +
+                        "," + patient.getVaccine() +
                         "," + patient.getInfected() +
                         "," + patient.count_infected(city) +
                         "," + patient.getCumulativeDistance());

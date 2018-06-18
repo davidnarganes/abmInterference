@@ -46,7 +46,7 @@ public class GUI extends GUIState {
     private Display2D display;
     private JFrame displayFrame;
     private ContinuousPortrayal2D yardPortrayal = new ContinuousPortrayal2D();
-    private NetworkPortrayal2D friendsPortrayal = new NetworkPortrayal2D();
+    private NetworkPortrayal2D peersPortrayal = new NetworkPortrayal2D();
     private TimeSeriesChartGenerator cumDistanceChart;
     private JFrame cumDistanceChartFrame;
     private TimeSeriesChartGenerator numInfectedVaccinatedChart;
@@ -189,7 +189,7 @@ public class GUI extends GUIState {
                                                 if (patient.getInfected()){
                                                     infectedColor = 255;
                                                 }
-                                                if (patient.getTreatment()){
+                                                if (patient.getVaccine()){
                                                     treatedColor = 255;
                                                 }
 
@@ -204,8 +204,8 @@ public class GUI extends GUIState {
         );
 
         // NETWORK PORTRAYAL
-        friendsPortrayal.setField(new SpatialNetwork2D(city.yard, city.friends));
-        friendsPortrayal.setPortrayalForAll(new SimpleEdgePortrayal2D(Color.white, null));
+        peersPortrayal.setField(new SpatialNetwork2D(city.yard, city.peers));
+        peersPortrayal.setPortrayalForAll(new SimpleEdgePortrayal2D(Color.lightGray, null));
 
         // RESCHEDULE THE DISPLAY
         display.reset();
@@ -233,7 +233,7 @@ public class GUI extends GUIState {
         displayFrame.setTitle("Smart City Display");
         c.registerFrame(displayFrame);
         displayFrame.setVisible(true);
-        display.attach(friendsPortrayal, "Friends");
+        display.attach(peersPortrayal, "Friends");
         display.attach(yardPortrayal, "City");
 
         // CHART CUMULATIVE DISTANCE

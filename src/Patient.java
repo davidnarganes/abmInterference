@@ -29,7 +29,7 @@ import sim.util.MutableDouble2D;
 
 public class Patient implements Steppable {
     private boolean infected;
-    private boolean treatment;
+    private boolean vaccine;
     private boolean sex;
     private double cumulativeDistance;
     private String name;
@@ -39,58 +39,66 @@ public class Patient implements Steppable {
         return "[" + System.identityHashCode(this) +
                 "]\nICD:" + getCumulativeDistance() +
                 "\nInfected:" + getInfected() +
-                "\nVaccine:" + getTreatment() +
+                "\nVaccine:" + getVaccine() +
                 "\nSex:" + getSex();
     }
 
     /** PATIENT CONSTRUCTOR
      * Here the properties of the object patient will be defined:
      * 1. Infection status
-     * 2. Treatment
+     * 2. Vaccine 
      * 3. Sex
      * 4. Cumulative Infected Distance
-     * 5. Name
+     * 5.Name 
      * @param name to specify a name per agent and be recognisable though the course of the simulation
      * @param city that is required to generate the random integer for the sex
      */
     public Patient (String name, City city){
         this.setInfected(false);
-        this.setTreatment(false);
+        this.setVaccine(false);
         this.setSex(city.random.nextBoolean());
         this.setCumulativeDistance(0.0);
         this.setName(name);
     }
 
-    /** DEFINE SET/GET ATTRIBUTES
-     * Methods to set or get the properties:
+    /** DEFINE SETTERS
+     * Methods to set The properties:
      * 1. Sex
      * 2. Infection state
-     * 3. Treatment state
+     * 3. Vaccine state
      * @param bool will be either a 0 or a 1 to indicate the value of the property
      */
-    public void setSex(boolean bool){
+    private void setSex(boolean bool){
         sex = bool;
     }
-    public void setInfected(boolean bool){
+    private void setInfected(boolean bool){
         infected = bool;
     }
-    public void setTreatment(boolean bool) {
-        treatment = bool;
+    private void setVaccine(boolean bool) {
+        vaccine = bool;
     }
-    public void setName(String string){
+    private void setName(String string){
         name = string;
     }
-    public void setCumulativeDistance(double value){
+    private void setCumulativeDistance(double value){
         cumulativeDistance = value;
     }
+
+    /** DEFINE GETTERS
+     * Methods to get the properties:
+     * 1. Sex
+     * 2. Infection state
+     * 3. Vaccine state
+     */
+
     public boolean getSex(){
         return sex;
     }
     public boolean getInfected(){
         return infected;
     }
-    public boolean getTreatment(){
-        return treatment;
+    public boolean getVaccine(){
+        return vaccine;
     }
     public double getCumulativeDistance(){
         return cumulativeDistance;
@@ -107,47 +115,52 @@ public class Patient implements Steppable {
      */
     public void step(SimState state){
         City city = (City) state;
+        long step = city.schedule.getSteps();
+
+        // INITIATE NETWORK
+        if (step == 1){
+            defineNetwork(city);
+        }
 
         // CHANGE NETWORK EACH X STEPS
-        changeFriendNetwork(city);
+        changeNetwork(city);
 
         // ACTUALISE LOCATION OF AGENTS
         actualiseLocation(city);
 
         // ACTUALISE PROBABILITY AT EACH STEP
-        apply_treatment(city);
+        apply_vaccine(city);
         apply_infection(city);
 
         // FINISH THE SIMULATION
-        long step = city.schedule.getSteps();
         if (step == city.earlyStop){
             city.finish();
         }
     }
 
     /** CHANGE FRIEND/ENEMY NETWORK
-     * At every step of the simulation there will be a probability of changing the prior set of friends
+     * At every step of the simulation there will be a probability of changing the prior set of peers
      * and enemies to ensure that all agents can interact among each other by:
      * 1. Defining a set of agents that will be FRIENDS to each individual agent
      * 2. Defining a set of agents that will be ENEMIES to each individual agent
      * @param city to get the current state of the agents
      */
 
-    private void changeFriend(City city){
+    public void defineNetwork(City city){
         Object other;
-        Bag friends = city.friends.getAllNodes();
-        Bag edges = city.friends.getEdges(this, new Bag());
+        Bag peers = city.peers.getAllNodes();
+        Bag edges = city.peers.getEdges(this, new Bag());
 
         for(int i = 0; i < edges.size(); i++){
-            city.friends.removeEdge((Edge) edges.get(i));
+            city.peers.removeEdge((Edge) edges.get(i));
         }
 
         // WHO LIKES?
         do
-            other = friends.get(city.random.nextInt(friends.numObjs));
+            other = peers.get(city.random.nextInt(peers.numObjs));
         while (this == other);
-        double friendship = city.random.nextDouble();
-        city.friends.addEdge(this,other,friendship);
+        double peership = city.random.nextDouble();
+        city.peers.addEdge(this,other,peership);
     }
 
     /** ACTUALISE LOCATION OF THE AGENTS AT EACH STEP
@@ -163,54 +176,59 @@ public class Patient implements Steppable {
 
     private void actualiseLocation(City city){
         Continuous2D yard = city.yard;
-        Double2D me = city.yard.getObjectLocation(this);
+        Double2D ego;
+        Double2D alter;
+        Double2D forceCentre;
+        Double2D forceRandom;
 
-        // GO THROUGH FRIENDS AND DETERMINE: 1.HOW MUCH THEY WANNA BE NEAR, 2. CUMULATIVE DISTANCE
+        ego = city.yard.getObjectLocation(this);
+
+        // Define forces
         MutableDouble2D sumForces = new MutableDouble2D();
-        MutableDouble2D forceVector = new MutableDouble2D();
+        MutableDouble2D forcePartner = new MutableDouble2D();
 
-        Bag out = city.friends.getEdges(this,null);
+        forceCentre = new Double2D((yard.width * 0.5 - ego.x) * city.getForceCenter(),
+                (yard.height * 0.5 - ego.y) * city.getForceCenter());
+        forceRandom = new Double2D(city.getRandomMultiplier() * city.random.nextDouble() - city.getRandomMultiplier() * 0.5,
+                city.getRandomMultiplier() * city.random.nextDouble() - city.getRandomMultiplier() * 0.5);
+
+        Bag out = city.peers.getEdges(this,null);
 
         for (int i = 0; i < out.size(); i++){
 
             Edge edge = (Edge) out.get(i);
 
-            double friendship = ((Double)(edge.info)).doubleValue();
+            double peership = ((Double) edge.info).doubleValue() * city.getPartnerMultiplier();
 
             // COULD BE THE TO() END OR THE FROM() END
-            Double2D him = city.yard.getObjectLocation(edge.getOtherNode(this));
+            alter = city.yard.getObjectLocation(edge.getOtherNode(this));
 
-            if(friendship >= 0){
-                forceVector.setTo((him.x - me.x) * friendship,
-                        (him.y - me.y) * friendship);
-                if(forceVector.length() > city.getMaxForce()){
-                    forceVector.resize(city.getMaxForce());
+            if(peership >= 0){
+                forcePartner.setTo((alter.x - ego.x) * peership,
+                        (alter.y - ego.y) * peership);
+
+                if(forcePartner.length() > city.getMaxForce()){
+                    forcePartner.resize(city.getMaxForce());
                 }
             } else {
-                forceVector.setTo((him.x - me.x) * friendship,
-                        (him.y - me.y) * friendship);
-                if(forceVector.length() > city.getMaxForce()){
-                    forceVector.resize(0.0);
+                forcePartner.setTo((alter.x - ego.x) * peership,
+                        (alter.y - ego.y) * peership);
+                if(forcePartner.length() > city.getMaxForce()){
+                    forcePartner.resize(0.0);
                 }
-                else if (forceVector.length() > 0){
-                    forceVector.resize(city.getMaxForce() - forceVector.length());
+                else if (forcePartner.length() > 0){
+                    forcePartner.resize(city.getMaxForce() - forcePartner.length());
                 }
             }
         }
 
-        sumForces.addIn(forceVector);
+        // Sum all forces
+        sumForces.addIn(forcePartner);
+        sumForces.addIn(forceCentre);
+        sumForces.addIn(forceRandom);
+        sumForces.addIn(ego);
 
-        // 3. FORCE TO CENTER VECTOR
-        // 4. RANDOM VECTOR
-        // 5. ME VECTOR: PRIOR LOCATION
-        Double2D centreVector = new Double2D((yard.width * 0.5 - me.x) * city.getForceCenter(),
-                (yard.height * 0.5 - me.y) * city.getForceCenter());
-        Double2D randomVector = new Double2D(city.getRandomMultiplier() * city.random.nextDouble() - city.getRandomMultiplier() * 0.5,
-                city.getRandomMultiplier() * city.random.nextDouble() - city.getRandomMultiplier() * 0.5);
-
-        sumForces.addIn(centreVector);
-        sumForces.addIn(randomVector);
-        sumForces.addIn(me);
+        // Actualise location
         city.yard.setObjectLocation(this, new Double2D(sumForces));
     }
 
@@ -220,7 +238,7 @@ public class Patient implements Steppable {
      * @return the cumulative distance between each agent and all the infected agents
      */
     private double calculateCumDistance(City city){
-        Bag agents = city.friends.getAllNodes();
+        Bag agents = city.peers.getAllNodes();
         double cumulativeVector = 0.0;
         Patient current;
         for(int i = 0; i < agents.size(); i++){
@@ -228,7 +246,7 @@ public class Patient implements Steppable {
             if(current.getInfected() && current != this){
                 Double2D one = city.yard.getObjectLocation(this);
                 Double2D other = city.yard.getObjectLocation(current);
-                cumulativeVector += (1 - 0.5 * current.getAllTreatment())/distance(one,other);
+                cumulativeVector += (1 - city.getInfectiousness() * current.getAllVaccine())/(1 + distance(one,other));
             }
         }
         setCumulativeDistance(cumulativeVector);
@@ -243,7 +261,7 @@ public class Patient implements Steppable {
      */
 
     public int count_infected(City city){
-        Bag agents = city.friends.getAllNodes();
+        Bag agents = city.peers.getAllNodes();
         Patient current;
         int count = 0;
         for(int i = 0; i < agents.size(); i++){
@@ -263,12 +281,12 @@ public class Patient implements Steppable {
      */
 
     public int count_vaccinated(City city){
-        Bag agents = city.friends.getAllNodes();
+        Bag agents = city.peers.getAllNodes();
         Patient current;
         int count = 0;
         for(int i = 0; i < agents.size(); i++){
             current = (Patient) agents.get(i);
-            if (current.getTreatment()){
+            if (current.getVaccine()){
                 count++;
             }
         }
@@ -292,39 +310,39 @@ public class Patient implements Steppable {
     }
 
     /** GET ALL TREATMENT
-     * Method to get the information about the treatment of all agents
-     * @return is a list of the treatment information
+     * Method to get the information about the vaccine of all agents
+     * @return is a list of the vaccine information
      */
 
-    private int getAllTreatment(){
-        return this.getTreatment() ? 1:0;
+    private int getAllVaccine(){
+        return this.getVaccine() ? 1:0;
     }
 
     /** PROBABILITY OF CHANGING THE NETWORK
-     * At every step there will be a probability of changing the group of friends/enemies of each agent to ensure
+     * At every step there will be a probability of changing the group of peers/enemies of each agent to ensure
      * that every patient has the probability of interacting with each other patient
      * @param city to import the random number generator
      */
-    private void changeFriendNetwork(City city){
-        double prob_changeFriend = city.random.nextDouble();
-        if(prob_changeFriend < city.getPromiscuityPopulation()){
-            changeFriend(city);
+    private void changeNetwork(City city){
+        double probChangeNetwork = city.random.nextDouble();
+        if(probChangeNetwork < city.getPromiscuityPopulation()){
+            defineNetwork(city);
         }
     }
 
     /** GENERATE TREATMENTS
-     * The probability of accessing the treatment will just depend on:
+     * The probability of accessing the vaccine will just depend on:
      * 1. The Sex as confounder
-     * 2. The basal probability of getting treatment
-     * 3. The outcome: no outcome, no treatment
+     * 2. The basal probability of getting vaccine
+     * 3. The outcome
      * @param city to get the pseudo-random number generator
      */
-    private void apply_treatment(City city){
+    private void apply_vaccine(City city){
         double rnd = city.random.nextDouble();
         int confounding_sex = this.getSex() ? 1:0;
-        double apply_treatment = (1 + city.getSexOverVaccine() * confounding_sex) * city.getProbVaccine();
-        if(rnd < apply_treatment){
-            setTreatment(true);
+        double apply_vaccine = (1 + city.getSexOnVaccine() * confounding_sex) * city.getProbVaccine();
+        if(rnd < apply_vaccine){
+            setVaccine(true);
         }
     }
 
@@ -340,12 +358,12 @@ public class Patient implements Steppable {
     private void apply_infection(City city){
         double rnd = city.random.nextDouble();
         int cause_sex = getAllSex();
-        int cause_treatment = getAllTreatment();
+        int cause_vaccine = getAllVaccine();
         int n_infected = count_infected(city);
         double cum_distance = calculateCumDistance(city);
-        double transmission = city.getTransmissionEffect()* n_infected / (1 + cum_distance);
-        double apply_infection = (1 + city.getSexOverInfection()*cause_sex -
-                city.getVaccineOverInfection()*cause_treatment +
+        double transmission = city.getContagion()* n_infected / (1 + cum_distance);
+        double apply_infection = (1 + city.getSexOnInfection() * cause_sex -
+                city.getVaccineOnInfection()*cause_vaccine +
                 transmission) * city.getProbInfected();
         if(rnd < apply_infection){
             setInfected(true);

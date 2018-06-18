@@ -22,21 +22,23 @@ The columns of the `params` file will be stored as properties of a FileParams ob
 
 public class FileParams {
     private ArrayList<Double> probInfected;
-    private ArrayList<Double> probTreatment;
-    private ArrayList<Integer> transmissionEffect;
-    private ArrayList<Integer> sexOverInfection;
-    private ArrayList<Integer> sexOverVaccine;
-    private ArrayList<Integer> vaccineOverInfection;
+    private ArrayList<Double> probVaccine;
+    private ArrayList<Double> contagion;
+    private ArrayList<Double> infectiousness;
+    private ArrayList<Integer> sexOnInfection;
+    private ArrayList<Integer> sexOnVaccine;
+    private ArrayList<Integer> vaccineOnInfection;
     private ArrayList<Double> promiscuityPopulation;
 
     // CONSTRUCTOR OF FILEPARAMS
     public FileParams(){
         this.probInfected = new ArrayList<>();
-        this.probTreatment = new ArrayList<>();
-        this.transmissionEffect = new ArrayList<>();
-        this.sexOverInfection  = new ArrayList<>();
-        this.sexOverVaccine  = new ArrayList<>();
-        this.vaccineOverInfection = new ArrayList<>();
+        this.probVaccine = new ArrayList<>();
+        this.contagion = new ArrayList<>();
+        this.infectiousness = new ArrayList<>();
+        this.sexOnInfection  = new ArrayList<>();
+        this.sexOnVaccine  = new ArrayList<>();
+        this.vaccineOnInfection = new ArrayList<>();
         this.promiscuityPopulation  = new ArrayList<>();
     }
 
@@ -47,35 +49,37 @@ public class FileParams {
     public void addProbInfected(Double value){
         this.probInfected.add(value);
     }
-    public double getProbTreatment(int index){
+    public double getProbVaccine(int index){
         return this.probInfected.get(index);
     }
-    public void addProbTreatment(Double value){
-        this.probTreatment.add(value);
+    public void addProbVaccine(Double value){
+        this.probVaccine.add(value);
     }
-    public int getTransmissionEffect(int index){
-        return this.transmissionEffect.get(index);
+    public double getContagion(int index){
+        return this.contagion.get(index);
     }
-    public void addTransmissionEffect(Integer value){
-        this.transmissionEffect.add(value);
+    public void addContagion(Double value){
+        this.contagion.add(value);
     }
-    public int getSexOverInfection(int index){
-        return this.sexOverInfection.get(index);
+    public double getInfectiousness(int index){return this.infectiousness.get(index);}
+    public void addInfectiousness(Double value){this.infectiousness.add(value);}
+    public int getSexOnInfection(int index){
+        return this.sexOnInfection.get(index);
     }
-    public void addSexOverInfection(Integer value){
-        this.sexOverInfection.add(value);
+    public void addSexOnInfection(Integer value){
+        this.sexOnInfection.add(value);
     }
-    public int getSexOverVaccine(int index){
-        return this.transmissionEffect.get(index);
+    public int getSexOnVaccine(int index){
+        return this.sexOnVaccine.get(index);
     }
-    public void addSexOverVaccine(int value){
-        this.transmissionEffect.add(value);
+    public void addSexOnVaccine(int value){
+        this.sexOnVaccine.add(value);
     }
-    public int getVaccineOverInfection(int index){
-        return this.vaccineOverInfection.get(index);
+    public int getVaccineOnInfection(int index){
+        return this.sexOnVaccine.get(index);
     }
-    public void addVaccineOverInfection(int value){
-        this.vaccineOverInfection.add(value);
+    public void addVaccineOnInfection(int value){
+        this.vaccineOnInfection.add(value);
     }
     public double getPromiscuityPopulation(int index){
         return this.promiscuityPopulation.get(index);

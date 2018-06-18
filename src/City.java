@@ -38,22 +38,22 @@ public class City extends SimState{
     private int numPatients = 1000;
     private double probInfected = 0.0001;
     private double probVaccine = 0.0003;
-    private double transmissionEffect = 0.5;
-    private int sexOverVaccine = 3;
-    private int sexOverInfection = 3;
-    private int vaccineOverInfection = 3;
+    private double contagion = 0.5;
+    private double infectiousness = 0.5;
+    private int sexOnVaccine = 3;
+    private int sexOnInfection = 3;
+    private int vaccineOnInfection = 3;
     private double promiscuityPopulation = 0.01;
     private double maxForce = 20.0;
-    private double forceCenter = 0.0005;
+    private double forceCenter = 0.0;
     private double randomMultiplier = 10.0;
-    private double infectiousnessEffect = 0.5;
+    private double partnerMultiplier = 10.0;
     private Scanner inputStream;
     private int lines = 0;
     private boolean multiSIM = true;
-
     public int earlyStop = 200;
     private int numIntervals = 1;
-    public Network friends = new Network(false);
+    public Network peers = new Network(false);
 
     /** CITY CONSTRUCTOR
      * @param seed for seeding a pseudo-random number generator
@@ -65,10 +65,10 @@ public class City extends SimState{
         this.setNumPatients(numPatients);
         this.setProbInfected(probInfected);
         this.setProbVaccine(probVaccine);
-        this.setTransmissionEffect(transmissionEffect);
-        this.setSexOverVaccine(sexOverVaccine);
-        this.setSexOverInfection(sexOverInfection);
-        this.setVaccineOverInfection(vaccineOverInfection);
+        this.setContagion(contagion);
+        this.setSexOnVaccine(sexOnVaccine);
+        this.setSexOnInfection(sexOnInfection);
+        this.setVaccineOnInfection(vaccineOnInfection);
         this.setPromiscuityPopulation(promiscuityPopulation);
     }
 
@@ -106,48 +106,48 @@ public class City extends SimState{
     public Object domProbVaccine() {
         return new Interval(0.0, 1.0);
     }
-    public double getTransmissionEffect(){
-        return transmissionEffect;
+    public double getContagion(){
+        return contagion;
     }
-    public void setTransmissionEffect(double value){
+    public void setContagion(double value){
         if (value >= 0.0){
-            transmissionEffect = value;
+            contagion = value;
         }
     }
-    public Object domTransmissionEffect(){
+    public Object domContagion(){
         return new Interval(0.0,10.0);
     }
-    public int getSexOverVaccine(){
-        return sexOverVaccine;
+    public int getSexOnVaccine(){
+        return sexOnVaccine;
     }
-    public void setSexOverVaccine(int value){
+    public void setSexOnVaccine(int value){
         if (value >= 0){
-            sexOverVaccine = value;
+            sexOnVaccine = value;
         }
     }
-    public Object domSexOverVaccine(){
+    public Object domSexOnVaccine(){
         return new Interval(0,10);
     }
-    public int getSexOverInfection(){
-        return sexOverInfection;
+    public int getSexOnInfection(){
+        return sexOnInfection;
     }
-    public void setSexOverInfection(int value){
+    public void setSexOnInfection(int value){
         if (value >= 0){
-            sexOverInfection = value;
+            sexOnInfection = value;
         }
     }
-    public Object domSexOverInfection(){
+    public Object domSexOnInfection(){
         return new Interval(0,10);
     }
-    public int getVaccineOverInfection(){
-        return vaccineOverInfection;
+    public int getVaccineOnInfection(){
+        return vaccineOnInfection;
     }
-    public void setVaccineOverInfection(int value){
+    public void setVaccineOnInfection(int value){
         if (value >= 0){
-            vaccineOverInfection = value;
+            vaccineOnInfection = value;
         }
     }
-    public Object domVaccineOverInfection(){
+    public Object domVaccineOnInfection(){
         return new Interval(0,10);
     }
     public double getPromiscuityPopulation(){
@@ -190,15 +190,18 @@ public class City extends SimState{
     {
         return new Interval(0.0,20.0);
     }
-    public double getInfectiousnessEffect(){
-        return infectiousnessEffect;
+    public double getInfectiousness(){
+        return infectiousness;
     }
-    public void setInfectiousnessEffect(double value){
-        infectiousnessEffect = value;
+    public void setInfectiousness(double value){
+        infectiousness = value;
     }
-    public Object domInfectiousnessEffect(){
+    public Object domInfectiousness(){
         return new Interval(0.0,1.0);
     }
+    public double getPartnerMultiplier(){return partnerMultiplier;}
+    public void setPartnerMultiplier(double value){partnerMultiplier = value;}
+    public Object domPartnerMultiplier(){return new Interval(1.0,20.0);}
 
     // GETTER SETTER LINES
     private int getLines(){
@@ -209,25 +212,42 @@ public class City extends SimState{
     }
 
 
-    // Get distribution of the time-dependent variables
+    /** GET DISTRUBUTION OF TIME-DEPENDENT VARIABLES IN GUI
+     * The mason library will automatically detect this methods and iteratively generate
+     * histograms of the distribution of
+     * Infection
+     * Vaccines
+     * Cumulative infected distance
+     * at each timepoint
+     * @return distribution of the variables
+     */
+
+    // INFECTION DISTRIBUTION
+
     public boolean[] getInfectionDistribution(){
-      Bag agents = friends.getAllNodes();
+      Bag agents = peers.getAllNodes();
       boolean[] distribution = new boolean[agents.numObjs];
       for(int i = 0; i < agents.numObjs; i++){
           distribution[i] = ((Patient)(agents.objs[i])).getInfected();
       }
       return distribution;
     }
+
+    // VACCINE DISTRIBUTION
+
     public boolean[] getVaccineDistribution(){
-        Bag agents = friends.getAllNodes();
+        Bag agents = peers.getAllNodes();
         boolean[] distribution = new boolean[agents.numObjs];
         for(int i = 0; i < agents.numObjs; i++){
-            distribution[i] = ((Patient)(agents.objs[i])).getTreatment();
+            distribution[i] = ((Patient)(agents.objs[i])).getVaccine();
         }
         return distribution;
     }
+
+    // CUMULATIVE INFECTION DISTANCE DISTRIBUTION
+
     public double[] getCumulativeDistanceDistribution(){
-        Bag agents = friends.getAllNodes();
+        Bag agents = peers.getAllNodes();
         double[] distribution = new double[agents.numObjs];
         for(int i = 0; i < agents.numObjs; i++){
             distribution[i] = ((Patient)(agents.objs[i])).getCumulativeDistance();
@@ -246,7 +266,7 @@ public class City extends SimState{
         int initialLocationMultiplier = 40;
 
         yard.clear();
-        friends.clear();
+        peers.clear();
 
         // ADD PATIENTS TO THE YARD
         for (int i = 0; i < this.getNumPatients(); i++){
@@ -257,7 +277,7 @@ public class City extends SimState{
                     yard.getHeight() * 0.5 +
                             initialLocationMultiplier * random.nextDouble() -
                             initialLocationMultiplier * 0.5));
-            friends.addNode(patient);
+            peers.addNode(patient);
             schedule.scheduleRepeating(patient);
         }
 
@@ -291,12 +311,13 @@ public class City extends SimState{
             String[] columns = allData.split(",");
 
             fileParams.addProbInfected(Double.parseDouble(columns[0]));
-            fileParams.addProbTreatment(Double.parseDouble(columns[1]));
-            fileParams.addTransmissionEffect(Integer.parseInt(columns[2]));
-            fileParams.addSexOverInfection(Integer.parseInt(columns[3]));
-            fileParams.addSexOverVaccine(Integer.parseInt(columns[4]));
-            fileParams.addVaccineOverInfection(Integer.parseInt(columns[5]));
-            fileParams.addPromiscuityPopulation(Double.parseDouble(columns[6]));
+            fileParams.addProbVaccine(Double.parseDouble(columns[1]));
+            fileParams.addContagion(Double.parseDouble(columns[2]));
+            fileParams.addInfectiousness(Double.parseDouble(columns[3]));
+            fileParams.addSexOnInfection(Integer.parseInt(columns[4]));
+            fileParams.addSexOnVaccine(Integer.parseInt(columns[5]));
+            fileParams.addVaccineOnInfection(Integer.parseInt(columns[6]));
+            fileParams.addPromiscuityPopulation(Double.parseDouble(columns[7]));
             this.setLines(index++);
         }
 
@@ -325,11 +346,12 @@ public class City extends SimState{
 
                 // Define params of SIM at each iteration
                 ((City) state).setProbInfected(fileParams.getProbInfected(i));
-                ((City) state).setProbVaccine(fileParams.getProbTreatment(i));
-                ((City) state).setTransmissionEffect(fileParams.getTransmissionEffect(i));
-                ((City) state).setSexOverInfection(fileParams.getSexOverInfection(i));
-                ((City) state).setSexOverVaccine(fileParams.getSexOverVaccine(i));
-                ((City) state).setVaccineOverInfection(fileParams.getVaccineOverInfection(i));
+                ((City) state).setProbVaccine(fileParams.getProbVaccine(i));
+                ((City) state).setContagion(fileParams.getContagion(i));
+                ((City) state).setContagion(fileParams.getInfectiousness(i));
+                ((City) state).setSexOnInfection(fileParams.getSexOnInfection(i));
+                ((City) state).setSexOnVaccine(fileParams.getSexOnVaccine(i));
+                ((City) state).setVaccineOnInfection(fileParams.getVaccineOnInfection(i));
                 ((City) state).setPromiscuityPopulation(fileParams.getPromiscuityPopulation(i));
 
                 // RUN THE SIM
