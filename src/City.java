@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.Scanner;
 
 /** CITY CLASS
- * This class will be a extension of the SimState from Mason
+ * This class will extend the SimState from Mason
  * The city will initialise the simulation by creating:
  * 1. The continuous space that will be defined as yard
  * 2. The patients that will be the agents of the simulation, defined in the n_patients
@@ -35,7 +35,7 @@ public class City extends SimState{
     public Continuous2D yard = new Continuous2D(1.0,80,80);
 
     // Default parameters
-    private int numPatients = 1000;
+    private int numPatients = 200;
     private double probInfected = 0.0001;
     private double probVaccine = 0.0003;
     private double contagion = 0.5;
@@ -44,15 +44,15 @@ public class City extends SimState{
     private int sexOnInfection = 3;
     private int vaccineOnInfection = 3;
     private double promiscuityPopulation = 0.01;
-    private double maxForce = 20.0;
+    private double maxPartnerForce = 20.0;
     private double forceCenter = 0.0;
     private double randomMultiplier = 10.0;
     private double partnerMultiplier = 10.0;
     private Scanner inputStream;
     private int lines = 0;
     private boolean multiSIM = true;
-    public int earlyStop = 200;
-    private int numIntervals = 1;
+    public int earlyGUIStop = 200;
+    private static int numIntervals = 1;
     public Network peers = new Network(false);
 
     /** CITY CONSTRUCTOR
@@ -162,10 +162,10 @@ public class City extends SimState{
         return new Interval(0.0,1.0);
     }
     public double getMaxForce(){
-        return maxForce;
+        return maxPartnerForce;
     }
     public void setMaxForce(double value){
-        maxForce = value;
+        maxPartnerForce = value;
     }
     public Object domMaxForce(){
         return new Interval(0.0,20.0);
@@ -255,6 +255,16 @@ public class City extends SimState{
         return distribution;
     }
 
+    public int[] getEdgesDegreeDistribution(){
+        Bag peers = this.peers.getAllNodes();
+        int[] distribution = new int[peers.numObjs];
+
+        for (int i = 0; i < peers.size(); i++){
+            Bag edges = this.peers.getEdges(peers.get(i), new Bag());
+            distribution[i] = edges.size();
+        }
+        return distribution;
+    }
     /** START
      * The simulation will initialise
      * The yard and network will be cleared while the agents are created and scheduled, stepped
@@ -360,7 +370,7 @@ public class City extends SimState{
                 do {
                     if (!state.schedule.step(state)) break;
                 }
-                while(state.schedule.getSteps() < ((City) state).earlyStop);
+                while(state.schedule.getSteps() < ((City) state).earlyGUIStop);
                 state.finish();
             }
 
@@ -372,7 +382,7 @@ public class City extends SimState{
             do {
                 if (!state.schedule.step(state)) break;
             }
-            while(state.schedule.getSteps() < ((City) state).earlyStop);
+            while(state.schedule.getSteps() < ((City) state).earlyGUIStop);
             state.finish();
             System.exit(0);
         }

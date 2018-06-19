@@ -146,7 +146,7 @@ public class Utils implements Steppable {
 
     /** STEP UTILS
      * The micro-simulation will be saved to a .txt file though the course of the simulation
-     * @param state
+     * @param state of hte SIMulation
      */
 
     public void step(SimState state){

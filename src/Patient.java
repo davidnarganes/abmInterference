@@ -110,7 +110,7 @@ public class Patient implements Steppable {
 
     /** STEP METHOD
      * All the defined methods/functions will be applied here to be applied at each step of the simulation
-     * The simulation will be finalised if it meets the condition of earlyStop
+     * The simulation will be finalised if it meets the condition of earlyGUIStop
      * @param state to get the current state of the simulation
      */
     public void step(SimState state){
@@ -118,7 +118,7 @@ public class Patient implements Steppable {
         long step = city.schedule.getSteps();
 
         // INITIATE NETWORK
-        if (step == 1){
+        if (step == 0){
             defineNetwork(city);
         }
 
@@ -133,7 +133,7 @@ public class Patient implements Steppable {
         apply_infection(city);
 
         // FINISH THE SIMULATION
-        if (step == city.earlyStop){
+        if (step == city.earlyGUIStop){
             city.finish();
         }
     }
@@ -160,6 +160,8 @@ public class Patient implements Steppable {
             other = peers.get(city.random.nextInt(peers.numObjs));
         while (this == other);
         double peership = city.random.nextDouble();
+
+        // Create a edge between this and other of magnitude peership
         city.peers.addEdge(this,other,peership);
     }
 
@@ -211,8 +213,8 @@ public class Patient implements Steppable {
                     forcePartner.resize(city.getMaxForce());
                 }
             } else {
-                forcePartner.setTo((alter.x - ego.x) * peership,
-                        (alter.y - ego.y) * peership);
+                forcePartner.setTo((alter.x - ego.x) * -peership,
+                        (alter.y - ego.y) * -peership);
                 if(forcePartner.length() > city.getMaxForce()){
                     forcePartner.resize(0.0);
                 }

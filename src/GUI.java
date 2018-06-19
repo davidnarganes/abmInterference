@@ -224,7 +224,7 @@ public class GUI extends GUIState {
 
         // DEFINE DIMENSIONS OF NEW CHARTS
         Dimension dim = new Dimension();
-        dim.setSize(550,400);
+        dim.setSize(550,380);
 
         super.init(c);
         display = new Display2D(700,500,this);
@@ -244,7 +244,6 @@ public class GUI extends GUIState {
         cumDistanceChart.setPreferredSize(dim);
         cumDistanceChartFrame = new JFrame();
         cumDistanceChartFrame.setTitle("Cumulative Distance Display");
-        cumDistanceChartFrame.setSize(100,100);
         cumDistanceChartFrame.setLocation(800,0);
         cumDistanceChartFrame.add(cumDistanceChart);
 
@@ -261,8 +260,7 @@ public class GUI extends GUIState {
         numInfectedVaccinatedChart.setPreferredSize(dim);
         numInfectedVaccinatedChartFrame = new JFrame();
         numInfectedVaccinatedChartFrame.setTitle("Counts of properties display");
-        numInfectedVaccinatedChartFrame.setSize(100,100);
-        numInfectedVaccinatedChartFrame.setLocation(800,500);
+        numInfectedVaccinatedChartFrame.setLocation(800,450);
         numInfectedVaccinatedChartFrame.add(numInfectedVaccinatedChart);
         numInfectedVaccinatedChartFrame.setVisible(true);
         numInfectedVaccinatedChartFrame.pack();
