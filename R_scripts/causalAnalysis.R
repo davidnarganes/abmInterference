@@ -1,17 +1,28 @@
-#install packages (if needed)
+# Install packages (if needed)
 install.packages("tableone")
 install.packages("ipw")
 install.packages("sandwich")
 install.packages("survey")
 
-# Get directory, filename, and libraries
-dirName <- getwd()
-fileName <- paste(dirName, "state_abm_causal_v3.txt", sep = "/")
-
-library(tableone)
+# Load libraries
+Vlibrary(tableone)
 library(ipw)
 library(sandwich)
 library(survey)
+
+# Get directory, filename, and libraries
+fileName <- "SIM_output/0.001_0.001_0.5_0.5_3_3_3_0.1_1000.txt"
+
+getFullFileName <- function(fileName){
+  dirName <- dirname(rstudioapi::getSourceEditorContext()$path)
+  pos <- gregexpr("/", dirName)
+  lastPos <- pos[[1]][length(pos[[1]])]
+  dirName2 <- substr(dirName,1,lastPos)
+  fileName <- paste(dirName2, fileName, sep = "")
+  return(fileName)
+}
+
+fileName <- getFullFileName(fileName)
 
 # Generate dataset and view: subselect
 all_content = readLines(fileName)

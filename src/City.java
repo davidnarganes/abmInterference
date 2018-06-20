@@ -44,10 +44,10 @@ public class City extends SimState{
     private int sexOnInfection = 3;
     private int vaccineOnInfection = 3;
     private double promiscuityPopulation = 0.01;
-    private double maxPartnerForce = 20.0;
+    private double maxPartnerForce = 5.0;
     private double forceCenter = 0.0;
-    private double randomMultiplier = 10.0;
-    private double partnerMultiplier = 10.0;
+    private double randomMultiplier = 5.0;
+    private double partnerMultiplier = 3.0;
     private Scanner inputStream;
     private int lines = 0;
     private boolean multiSIM = true;
