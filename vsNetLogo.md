@@ -1,7 +1,7 @@
 ## Causal Inference ABM vs. NetLogo
 The Spread of Disease model of NetLogo (SODNL) can be found as one of the set models in http://ccl.northwestern.edu/netlogo/models/SpreadofDisease.
 
- | CIABM | SODNL
+... | CIABM | SODNL
 --- | --- | ---
 Causal effects| Adjustable for (i) confounder on vaccine, (ii) confounder on infection, (iii) vaccine on infection, (iv) contagion, (v) infectiousness | Fixed contagion
 Environment | Continuous | Discrete
