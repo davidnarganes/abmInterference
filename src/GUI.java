@@ -111,7 +111,7 @@ public class GUI extends GUIState {
                 double cumDistanceSum = 0;
                 long numPatients = agents.size();
                 for(int i = 0; i < numPatients; i++){
-                    cumDistance = ((Patient) agents.get(i)).getCumulativeDistance();
+                    cumDistance = ((Patient) agents.get(i)).getIndirectInferference();
                     cumDistanceSum += cumDistance;
                     if (cumDistance > maxCumDistance){
                         maxCumDistance = cumDistance;

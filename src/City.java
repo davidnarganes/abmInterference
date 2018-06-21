@@ -37,7 +37,9 @@ public class City extends SimState{
     // Default parameters
     private int numPatients = 200;
     private double probInfected = 0.0001;
-    private double probVaccine = 0.0003;
+    private double probVaccine = 0.0002;
+    private double probEdge = 0.03;
+    private double lambda = 0.3;
     private double contagion = 0.5;
     private double infectiousness = 0.5;
     private int sexOnVaccine = 3;
@@ -48,6 +50,8 @@ public class City extends SimState{
     private double forceCenter = 0.0;
     private double randomMultiplier = 5.0;
     private double partnerMultiplier = 3.0;
+
+    // Other variables
     private Scanner inputStream;
     private int lines = 0;
     private boolean multiSIM = true;
@@ -72,144 +76,58 @@ public class City extends SimState{
         this.setPromiscuityPopulation(promiscuityPopulation);
     }
 
-    // Lots of getters and setters to change them in the SIM
-    public int getNumPatients() {
-        return numPatients;
-    }
-    public void setNumPatients(int patients) {
-        if (patients >= 0){
-            numPatients = patients;
-        }
-    }
-    public Object domNumPatients() {
-        return new Interval(1, 5000);
-    }
-    public double getProbInfected() {
-        return probInfected ;
-    }
-    public void setProbInfected(double value) {
-        if (value >= 0.0){
-            probInfected = value;
-        }
-    }
-    public Object domProbInfected() {
-        return new Interval(0.0, 1.0);
-    }
-    public double getProbVaccine() {
-        return probVaccine ;
-    }
-    public void setProbVaccine(double value) {
-        if (value >= 0.0){
-            probVaccine = value;
-        }
-    }
-    public Object domProbVaccine() {
-        return new Interval(0.0, 1.0);
-    }
-    public double getContagion(){
-        return contagion;
-    }
-    public void setContagion(double value){
-        if (value >= 0.0){
-            contagion = value;
-        }
-    }
-    public Object domContagion(){
-        return new Interval(0.0,10.0);
-    }
-    public int getSexOnVaccine(){
-        return sexOnVaccine;
-    }
-    public void setSexOnVaccine(int value){
-        if (value >= 0){
-            sexOnVaccine = value;
-        }
-    }
-    public Object domSexOnVaccine(){
-        return new Interval(0,10);
-    }
-    public int getSexOnInfection(){
-        return sexOnInfection;
-    }
-    public void setSexOnInfection(int value){
-        if (value >= 0){
-            sexOnInfection = value;
-        }
-    }
-    public Object domSexOnInfection(){
-        return new Interval(0,10);
-    }
-    public int getVaccineOnInfection(){
-        return vaccineOnInfection;
-    }
-    public void setVaccineOnInfection(int value){
-        if (value >= 0){
-            vaccineOnInfection = value;
-        }
-    }
-    public Object domVaccineOnInfection(){
-        return new Interval(0,10);
-    }
-    public double getPromiscuityPopulation(){
-        return promiscuityPopulation;
-    }
-    public void setPromiscuityPopulation(double value){
-        if (value >= 0.0){
-            promiscuityPopulation = value;
-        }
-    }
-    public Object domPromiscuityPopulation(){
-        return new Interval(0.0,1.0);
-    }
-    public double getMaxForce(){
-        return maxPartnerForce;
-    }
-    public void setMaxForce(double value){
-        maxPartnerForce = value;
-    }
-    public Object domMaxForce(){
-        return new Interval(0.0,20.0);
-    }
-    public double getForceCenter(){
-        return forceCenter;
-    }
-    public void setForceCenter(double value){
-        forceCenter = value;
-    }
-    public Object domForceCenter(){
-        return new Interval(-1.0, 20.0);
-    }
-    public double getRandomMultiplier(){
-        return randomMultiplier;
-    }
-    public void setRandomMultiplier(double value){
-        randomMultiplier = value;
-    }
-    public Object domRandomMultiplier()
-
-    {
-        return new Interval(0.0,20.0);
-    }
-    public double getInfectiousness(){
-        return infectiousness;
-    }
-    public void setInfectiousness(double value){
-        infectiousness = value;
-    }
-    public Object domInfectiousness(){
-        return new Interval(0.0,1.0);
-    }
+    // Getters
+    public int getNumPatients(){return numPatients;}
+    public double getProbInfected(){return probInfected;}
+    public double getProbVaccine(){return probVaccine;}
+    public double getProbEdge(){return probEdge;}
+    public double getLambda(){return lambda;}
+    public double getContagion(){return contagion;}
+    public double getInfectiousness(){return infectiousness;}
+    public int getSexOnVaccine(){return sexOnVaccine;}
+    public int getSexOnInfection(){return sexOnInfection;}
+    public int getVaccineOnInfection(){return vaccineOnInfection;}
+    public double getPromiscuityPopulation(){return promiscuityPopulation;}
+    public double getMaxPartnerForce(){return maxPartnerForce;}
+    public double getForceCenter(){return forceCenter;}
+    public double getRandomMultiplier(){return randomMultiplier;}
     public double getPartnerMultiplier(){return partnerMultiplier;}
-    public void setPartnerMultiplier(double value){partnerMultiplier = value;}
-    public Object domPartnerMultiplier(){return new Interval(1.0,20.0);}
+    public int getLines(){return lines;}
 
-    // GETTER SETTER LINES
-    private int getLines(){
-        return lines;
-    }
-    private void setLines(int value){
-        lines = value;
-    }
+    // Setters
+    public void setNumPatients(int value){numPatients = value;}
+    public void setProbInfected(double value){probInfected = value;}
+    public void setProbVaccine(double value){probVaccine = value;}
+    public void setProbEdge(double value){probEdge = value;}
+    public void setLambda(double value){lambda = value;}
+    public void setContagion(double value){contagion = value;}
+    public void setInfectiousness(double value){infectiousness = value;}
+    public void setSexOnVaccine(int value){sexOnVaccine = value;}
+    public void setSexOnInfection(int value){sexOnInfection = value;}
+    public void setVaccineOnInfection(int value){vaccineOnInfection = value;}
+    public void setPromiscuityPopulation(double value){promiscuityPopulation = value;}
+    public void setMaxPartnerForce(double value){maxPartnerForce = value;}
+    public void setForceCenter(double value){forceCenter = value;}
+    public void setRandomMultiplier(double value){randomMultiplier = value;}
+    public void setPartnerMultiplier(double value){partnerMultiplier = value;}
+    public void setLines(int value){lines = value;}
+
+    // Domains
+    public Object domNumPatients(){return new Interval(1,3000);}
+    public Object domProbInfected(){return new Interval(0.0,0.5);}
+    public Object domProbVaccine(){return new Interval(0.0,0.5);}
+    public Object domPromEdge(){return new Interval(0.0,1.0);}
+    public Object domLambda(){return new Interval(0.0,50.0);}
+    public Object domContagion(){return new Interval(0.0,20);}
+    public Object domInfectiousness(){return new Interval(0.0,20);}
+    public Object domSexOnVaccine(){return new Interval(1,20);}
+    public Object domSexOnInfection(){return new Interval(1,20);}
+    public Object domVaccineOnInfection(){return new Interval(1,20);}
+    public Object domPromiscuityPopulation(){return new Interval(0.0,1.0);}
+    public Object domMaxPartnerForce(){return new Interval(0.0,20.0);}
+    public Object domForceCenter(){return new Interval(0.0,20.0);}
+    public Object domRandomMultiplier(){return new Interval(0.0,20.0);}
+    public Object domPartnerMultiplier(){return new Interval(0.0,20.0);}
 
 
     /** GET DISTRUBUTION OF TIME-DEPENDENT VARIABLES IN GUI
@@ -223,7 +141,6 @@ public class City extends SimState{
      */
 
     // INFECTION DISTRIBUTION
-
     public boolean[] getInfectionDistribution(){
       Bag agents = peers.getAllNodes();
       boolean[] distribution = new boolean[agents.numObjs];
@@ -234,7 +151,6 @@ public class City extends SimState{
     }
 
     // VACCINE DISTRIBUTION
-
     public boolean[] getVaccineDistribution(){
         Bag agents = peers.getAllNodes();
         boolean[] distribution = new boolean[agents.numObjs];
@@ -245,23 +161,22 @@ public class City extends SimState{
     }
 
     // CUMULATIVE INFECTION DISTANCE DISTRIBUTION
-
     public double[] getCumulativeDistanceDistribution(){
         Bag agents = peers.getAllNodes();
         double[] distribution = new double[agents.numObjs];
         for(int i = 0; i < agents.numObjs; i++){
-            distribution[i] = ((Patient)(agents.objs[i])).getCumulativeDistance();
+            distribution[i] = ((Patient)(agents.objs[i])).getIndirectInferference();
         }
         return distribution;
     }
 
+    // EDGES DISTRIBUTION
     public int[] getEdgesDegreeDistribution(){
         Bag peers = this.peers.getAllNodes();
         int[] distribution = new int[peers.numObjs];
 
         for (int i = 0; i < peers.size(); i++){
-            Bag edges = this.peers.getEdges(peers.get(i), new Bag());
-            distribution[i] = edges.size();
+            distribution[i] = ((Patient) peers.objs[i]).getDegree();
         }
         return distribution;
     }

@@ -130,7 +130,7 @@ public class Utils implements Steppable {
                         "," + patient.getVaccine() +
                         "," + patient.getInfected() +
                         "," + patient.count_infected(city) +
-                        "," + patient.getCumulativeDistance());
+                        "," + patient.getIndirectInferference());
                 writer.write(System.getProperty("line.separator"));
             }
         } catch (IOException ex){

@@ -31,16 +31,20 @@ public class Patient implements Steppable {
     private boolean infected;
     private boolean vaccine;
     private boolean sex;
-    private double cumulativeDistance;
+    private int degree;
+    private double contagionDistance;
+    private double infectiousnessDistance;
+    private double indirectInferference;
     private String name;
 
     // LABEL TO DISPLAY IN SIM WHEN SELECTED
     public String toString(){
         return "[" + System.identityHashCode(this) +
-                "]\nICD:" + getCumulativeDistance() +
+                "]\nCD:" + getContagionDistance() +
                 "\nInfected:" + getInfected() +
                 "\nVaccine:" + getVaccine() +
-                "\nSex:" + getSex();
+                "\nSex:" + getSex() +
+                "\nDegree:" + getDegree();
     }
 
     /** PATIENT CONSTRUCTOR
@@ -57,17 +61,14 @@ public class Patient implements Steppable {
         this.setInfected(false);
         this.setVaccine(false);
         this.setSex(city.random.nextBoolean());
-        this.setCumulativeDistance(0.0);
+        this.setDegree(0);
+        this.setContagionDistance(0.0);
+        this.setInfectiousnessDistance(0.0);
+        this.setIndirectInferference(0.0);
         this.setName(name);
     }
 
-    /** DEFINE SETTERS
-     * Methods to set The properties:
-     * 1. Sex
-     * 2. Infection state
-     * 3. Vaccine state
-     * @param bool will be either a 0 or a 1 to indicate the value of the property
-     */
+    // Setters
     private void setSex(boolean bool){
         sex = bool;
     }
@@ -80,17 +81,14 @@ public class Patient implements Steppable {
     private void setName(String string){
         name = string;
     }
-    private void setCumulativeDistance(double value){
-        cumulativeDistance = value;
+    private void setDegree(int value){degree = value;}
+    private void setContagionDistance(double value){
+        contagionDistance = value;
     }
+    private void setInfectiousnessDistance(double value){infectiousnessDistance = value;}
+    private void setIndirectInferference(double value){indirectInferference = value;}
 
-    /** DEFINE GETTERS
-     * Methods to get the properties:
-     * 1. Sex
-     * 2. Infection state
-     * 3. Vaccine state
-     */
-
+    // Getters
     public boolean getSex(){
         return sex;
     }
@@ -100,12 +98,15 @@ public class Patient implements Steppable {
     public boolean getVaccine(){
         return vaccine;
     }
-    public double getCumulativeDistance(){
-        return cumulativeDistance;
-    }
     public String getName(){
         return name;
     }
+    public int getDegree(){return degree;}
+    public double getContagionDistance(){
+        return contagionDistance;
+    }
+    public double getInfectiousnessDistance(){return infectiousnessDistance;}
+    public double getIndirectInferference(){return indirectInferference;}
 
 
     /** STEP METHOD
@@ -120,10 +121,16 @@ public class Patient implements Steppable {
         // INITIATE NETWORK
         if (step == 0){
             defineNetwork(city);
+            actualiseDegree(city);
         }
 
         // CHANGE NETWORK EACH X STEPS
         changeNetwork(city);
+
+        // test
+        for(int i = 0; i < 5; i++){
+            System.out.println(PoissonCDF(i,city.getLambda()));
+        }
 
         // ACTUALISE LOCATION OF AGENTS
         actualiseLocation(city);
@@ -151,18 +158,30 @@ public class Patient implements Steppable {
         Bag peers = city.peers.getAllNodes();
         Bag edges = city.peers.getEdges(this, new Bag());
 
+        // Clean ALL previous edges
         for(int i = 0; i < edges.size(); i++){
             city.peers.removeEdge((Edge) edges.get(i));
         }
 
-        // WHO LIKES?
-        do
-            other = peers.get(city.random.nextInt(peers.numObjs));
-        while (this == other);
-        double peership = city.random.nextDouble();
+        // Iterate though peers and add edge based on Poisson probability
+        for(int i = 0; i < peers.size(); i++) {
+            other = (Patient) peers.get(i);
 
-        // Create a edge between this and other of magnitude peership
-        city.peers.addEdge(this,other,peership);
+            if (city.random.nextDouble() < PoissonCDF(this.getDegree() + ((Patient) other).getDegree(), city.getLambda())){
+                if (this != other) {
+                    double peership = city.random.nextDouble();
+                    city.peers.addEdge(this, other, peership);
+
+                    // Actualise degree of this and other
+                    this.setDegree(this.getDegree() + 1);
+                    ((Patient) other).setDegree(((Patient) other).getDegree() + 1);
+                }
+            }
+        }
+    }
+
+    private void actualiseDegree(City city){
+        this.setDegree(city.peers.getEdges(this, new Bag()).size());
     }
 
     /** ACTUALISE LOCATION OF THE AGENTS AT EACH STEP
@@ -209,17 +228,17 @@ public class Patient implements Steppable {
                 forcePartner.setTo((alter.x - ego.x) * peership,
                         (alter.y - ego.y) * peership);
 
-                if(forcePartner.length() > city.getMaxForce()){
-                    forcePartner.resize(city.getMaxForce());
+                if(forcePartner.length() > city.getMaxPartnerForce()){
+                    forcePartner.resize(city.getMaxPartnerForce());
                 }
             } else {
                 forcePartner.setTo((alter.x - ego.x) * -peership,
                         (alter.y - ego.y) * -peership);
-                if(forcePartner.length() > city.getMaxForce()){
+                if(forcePartner.length() > city.getMaxPartnerForce()){
                     forcePartner.resize(0.0);
                 }
                 else if (forcePartner.length() > 0){
-                    forcePartner.resize(city.getMaxForce() - forcePartner.length());
+                    forcePartner.resize(city.getMaxPartnerForce() - forcePartner.length());
                 }
             }
         }
@@ -251,7 +270,7 @@ public class Patient implements Steppable {
                 cumulativeVector += (1 - city.getInfectiousness() * current.getAllVaccine())/(1 + distance(one,other));
             }
         }
-        setCumulativeDistance(cumulativeVector);
+        setIndirectInferference(cumulativeVector);
         return cumulativeVector;
     }
 
@@ -330,6 +349,7 @@ public class Patient implements Steppable {
         if(probChangeNetwork < city.getPromiscuityPopulation()){
             defineNetwork(city);
         }
+        actualiseDegree(city);
     }
 
     /** GENERATE TREATMENTS
@@ -383,5 +403,51 @@ public class Patient implements Steppable {
         double y = Math.abs(other.y - one.y);
         double x = Math.abs(other.x - one.x);
         return Math.sqrt(y*y + x*x);
+    }
+
+    /** POISSON CUMULATIVE DENSITY FUNCTION: LEFT
+     * To calculate the left cumulative probability
+     * @param x point
+     * @param lambda mean of the function and variance
+     * @return the cdf
+     */
+    private double PoissonCDF(int x, double lambda){
+        double result = 0.0;
+        int i = 0;
+        while (i < x) {
+            result = result + Poisson(i, lambda);
+            i = i + 1;
+        }
+        return 1 - result;
+    }
+
+    /**
+     * def poissonPDF(x,lambdaa):
+     *     get = i = 0
+     *     while i < x:
+     *         get = get + f(i,lambdaa)
+     *         i = i + 1
+     *     return 1 - get
+     */
+
+    /** POISSON FUNCTION
+     * @param x point
+     * @param lambda as defined
+     * @return the probability
+     */
+    private double Poisson(int x, double lambda){
+        return (Math.pow(lambda, x) * Math.exp(-lambda)) / factorial(x);
+    }
+
+    /** FACTORIAL FUNCTION
+     * @param N to calculate N!
+     * @return factorial of N
+     */
+    private static long factorial(int N) {
+        long multi = 1;
+        for (int i = 1; i <= N; i++) {
+            multi = multi * i;
+        }
+        return multi;
     }
 }
