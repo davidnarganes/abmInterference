@@ -17,6 +17,9 @@
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Bag;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 
 /** UTILS
@@ -24,13 +27,13 @@ import java.io.*;
  */
 public class Utils implements Steppable {
 
-    private String dirName = "SIM_output";
+    private String dirName = "output";
 
     /** UTILS CONSTRUCTOR
      * Every time the object is called it will create the file to save the changes in the simulation
      */
 
-    public Utils(City city){
+    public Utils(City city) throws Exception {
         createDataFile(city);
     }
 
@@ -44,19 +47,27 @@ public class Utils implements Steppable {
      * 6. Cumulative infected distance
      */
 
-    private void createDataFile(City city){
+    private void createDataFile(City city) throws Exception {
         Writer writer = null;
 
-        String filename = (city.getProbInfected() + "_" +
-                city.getProbVaccine() + "_" +
-                city.getContagion() + "_" +
-                city.getInfectiousness() + "_" +
-                city.getSexOnInfection() + "_" +
-                city.getSexOnVaccine() + "_" +
-                city.getVaccineOnInfection() + "_" +
-                city.getPromiscuityPopulation() + "_" +
-                city.getNumPatients() +
+
+        // Generate a unique hash per file
+        String filename = (city.getNumPatients() + "," +
+                city.getProbInfected() + "," +
+                city.getProbVaccine() + "," +
+                city.getLambda() + "," +
+                city.getContagion() + "," +
+                city.getInfectiousness() + "," +
+                city.getSexOnInfection() + "," +
+                city.getSexOnVaccine() + "," +
+                city.getVaccineOnInfection() + "," +
+                city.getPromiscuityPopulation() + "," +
+                city.getMaxPartnerForce() + "," +
+                city.getRandomForce() + "," +
+                city.getPartnerForce() +
                 ".txt");
+
+        Integer filenameHash = filename.hashCode();
 
         File dir = new File(dirName);
         if (! dir.exists()){
@@ -65,20 +76,24 @@ public class Utils implements Steppable {
 
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(dirName + "/" + filename, false),
+                    new FileOutputStream(dirName + "/" + filenameHash.toString(), false),
                     "utf-8"));
-            writer.write("probInfected:" + city.getProbInfected() + ","  +
-                    "probVaccine:" + city.getProbVaccine() + ","  +
-                    "contagion:" + city.getContagion() + ","  +
-                    "sexOnInfection:" + city.getSexOnInfection() + ","  +
-                    "sexOnVaccine:" + city.getSexOnVaccine() + ","  +
-                    "vaccineOnInfection:" + city.getVaccineOnInfection() + ","  +
-                    "promiscuityPopulation:" + city.getPromiscuityPopulation() + ","  +
-                    "numPatients:" + city.getNumPatients()
 
+            writer.write("numPatients=" + city.getNumPatients() + "," +
+                    "probInfected=" + city.getProbInfected() + ","  +
+                    "probVaccine=" + city.getProbVaccine() + ","  +
+                    "lambda=" + city.getLambda() + "," +
+                    "contagion=" + city.getContagion() + ","  +
+                    "sexOnInfection=" + city.getSexOnInfection() + ","  +
+                    "sexOnVaccine=" + city.getSexOnVaccine() + ","  +
+                    "vaccineOnInfection=" + city.getVaccineOnInfection() + ","  +
+                    "promiscuityPopulation=" + city.getPromiscuityPopulation() + ","  +
+                    "maxPartnerForce=" + city.getMaxPartnerForce() + "," +
+                    "randomForce=" + city.getRandomForce() + "," +
+                    "partnerForce=" + city.getPartnerForce()
             );
             writer.write(System.getProperty("line.separator"));
-            writer.write("step,agent,sex,treatment,outcome,count_infected,cumulative_distance");
+            writer.write("step,agent,sex,vaccine,infection,degree,contagionDist,infectiousnessDist,indInferference");
             writer.write(System.getProperty("line.separator"));
         } catch (IOException ex){
             System.out.println("Error creating file");
@@ -96,27 +111,33 @@ public class Utils implements Steppable {
      * @param city to import the state of the simulation
      */
 
-    public void writeStep(City city){
+    public void writeStep(City city) throws Exception {
 
         long step = city.schedule.getSteps();
         Writer writer = null;
 
-        String filename = (city.getProbInfected() + "_" +
-                city.getProbVaccine() + "_" +
-                city.getContagion() + "_" +
-                city.getInfectiousness() + "_" +
-                city.getSexOnInfection() + "_" +
-                city.getSexOnVaccine() + "_" +
-                city.getVaccineOnInfection() + "_" +
-                city.getPromiscuityPopulation() + "_" +
-                city.getNumPatients() +
+        // Generate a unique hash per file
+        String filename = (city.getNumPatients() + "," +
+                city.getProbInfected() + "," +
+                city.getProbVaccine() + "," +
+                city.getLambda() + "," +
+                city.getContagion() + "," +
+                city.getInfectiousness() + "," +
+                city.getSexOnInfection() + "," +
+                city.getSexOnVaccine() + "," +
+                city.getVaccineOnInfection() + "," +
+                city.getPromiscuityPopulation() + "," +
+                city.getMaxPartnerForce() + "," +
+                city.getRandomForce() + "," +
+                city.getPartnerForce() +
                 ".txt");
 
+        Integer filenameHash = filename.hashCode();
         Patient patient;
 
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(dirName + "/" + filename, true),
+                    new FileOutputStream(dirName + "/" + filenameHash.toString(), true),
                     "utf-8")
             );
 
@@ -129,8 +150,11 @@ public class Utils implements Steppable {
                         "," + patient.getSex() +
                         "," + patient.getVaccine() +
                         "," + patient.getInfected() +
-                        "," + patient.count_infected(city) +
+                        "," + patient.getDegree() +
+                        "," + patient.getContagionDistance() +
+                        "," + patient.getInfectiousnessDistance() +
                         "," + patient.getIndirectInferference());
+
                 writer.write(System.getProperty("line.separator"));
             }
         } catch (IOException ex){
@@ -144,13 +168,35 @@ public class Utils implements Steppable {
         }
     }
 
+    // Method to encrypt the filename: blowfish method:
+    // src = http://www.adeveloperdiary.com/java/how-to-easily-encrypt-and-decrypt-text-in-java/
+    public static String encrypt(String strClearText, String strKey) throws Exception{
+        String strData="";
+
+        try {
+            SecretKeySpec skeyspec = new SecretKeySpec(strKey.getBytes(),"Blowfish");
+            Cipher cipher=Cipher.getInstance("Blowfish");
+            cipher.init(Cipher.ENCRYPT_MODE, skeyspec);
+            byte[] encrypted=cipher.doFinal(strClearText.getBytes());
+            strData=new String(encrypted);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e);
+        }
+        return strData;
+    }
     /** STEP UTILS
      * The micro-simulation will be saved to a .txt file though the course of the simulation
-     * @param state of hte SIMulation
+     * @param state of the simulation
      */
 
     public void step(SimState state){
         City city = (City) state;
-        writeStep(city);
+        try {
+            writeStep(city);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

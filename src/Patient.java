@@ -28,9 +28,9 @@ import sim.util.MutableDouble2D;
  */
 
 public class Patient implements Steppable {
-    private boolean infected;
-    private boolean vaccine;
-    private boolean sex;
+    private Boolean infected;
+    private Boolean vaccine;
+    private Boolean sex;
     private int degree;
     private double contagionDistance;
     private double infectiousnessDistance;
@@ -48,16 +48,11 @@ public class Patient implements Steppable {
     }
 
     /** PATIENT CONSTRUCTOR
-     * Here the properties of the object patient will be defined:
-     * 1. Infection status
-     * 2. Vaccine 
-     * 3. Sex
-     * 4. Cumulative Infected Distance
-     * 5.Name 
      * @param name to specify a name per agent and be recognisable though the course of the simulation
      * @param city that is required to generate the random integer for the sex
      */
     public Patient (String name, City city){
+        this.setName(name);
         this.setInfected(false);
         this.setVaccine(false);
         this.setSex(city.random.nextBoolean());
@@ -65,7 +60,6 @@ public class Patient implements Steppable {
         this.setContagionDistance(0.0);
         this.setInfectiousnessDistance(0.0);
         this.setIndirectInferference(0.0);
-        this.setName(name);
     }
 
     // Setters
@@ -108,7 +102,6 @@ public class Patient implements Steppable {
     public double getInfectiousnessDistance(){return infectiousnessDistance;}
     public double getIndirectInferference(){return indirectInferference;}
 
-
     /** STEP METHOD
      * All the defined methods/functions will be applied here to be applied at each step of the simulation
      * The simulation will be finalised if it meets the condition of earlyGUIStop
@@ -124,20 +117,20 @@ public class Patient implements Steppable {
             actualiseDegree(city);
         }
 
-        // CHANGE NETWORK EACH X STEPS
+        // 1. CHANGE NETWORK EACH X STEPS
         changeNetwork(city);
 
-        // test
-        for(int i = 0; i < 5; i++){
-            System.out.println(PoissonCDF(i,city.getLambda()));
-        }
-
-        // ACTUALISE LOCATION OF AGENTS
+        // 2. ACTUALISE LOCATION OF AGENTS
         actualiseLocation(city);
 
-        // ACTUALISE PROBABILITY AT EACH STEP
-        apply_vaccine(city);
-        apply_infection(city);
+        // 3. APPLY VACCINE
+        applyVaccine(city);
+
+        // 4. APPLY INFECTION
+        applyInfection(city);
+
+        // 5. ADD INTERFERENCE
+        addIndirectInterference(city);
 
         // FINISH THE SIMULATION
         if (step == city.earlyGUIStop){
@@ -199,7 +192,6 @@ public class Patient implements Steppable {
         Continuous2D yard = city.yard;
         Double2D ego;
         Double2D alter;
-        Double2D forceCentre;
         Double2D forceRandom;
 
         ego = city.yard.getObjectLocation(this);
@@ -208,10 +200,8 @@ public class Patient implements Steppable {
         MutableDouble2D sumForces = new MutableDouble2D();
         MutableDouble2D forcePartner = new MutableDouble2D();
 
-        forceCentre = new Double2D((yard.width * 0.5 - ego.x) * city.getForceCenter(),
-                (yard.height * 0.5 - ego.y) * city.getForceCenter());
-        forceRandom = new Double2D(city.getRandomMultiplier() * city.random.nextDouble() - city.getRandomMultiplier() * 0.5,
-                city.getRandomMultiplier() * city.random.nextDouble() - city.getRandomMultiplier() * 0.5);
+        forceRandom = new Double2D(city.getRandomForce() * city.random.nextDouble() - city.getRandomForce() * 0.5,
+                city.getRandomForce() * city.random.nextDouble() - city.getRandomForce() * 0.5);
 
         Bag out = city.peers.getEdges(this,null);
 
@@ -219,7 +209,7 @@ public class Patient implements Steppable {
 
             Edge edge = (Edge) out.get(i);
 
-            double peership = ((Double) edge.info).doubleValue() * city.getPartnerMultiplier();
+            double peership = ((Double) edge.info).doubleValue() * city.getPartnerForce();
 
             // COULD BE THE TO() END OR THE FROM() END
             alter = city.yard.getObjectLocation(edge.getOtherNode(this));
@@ -245,7 +235,6 @@ public class Patient implements Steppable {
 
         // Sum all forces
         sumForces.addIn(forcePartner);
-        sumForces.addIn(forceCentre);
         sumForces.addIn(forceRandom);
         sumForces.addIn(ego);
 
@@ -253,90 +242,76 @@ public class Patient implements Steppable {
         city.yard.setObjectLocation(this, new Double2D(sumForces));
     }
 
-    /** CALCULATE CUMULATIVE DISTANCE
+    /** Get total Indirect Interference
      * To determine how close is each agent with regards to the infected agents
      * @param city to get the agents
      * @return the cumulative distance between each agent and all the infected agents
      */
-    private double calculateCumDistance(City city){
+    private void addIndirectInterference(City city){
         Bag agents = city.peers.getAllNodes();
-        double cumulativeVector = 0.0;
-        Patient current;
+        Patient alter;
+
+        // Calculate the following parameters
+        double contagionDistance = 0.0;
+        double infectiousnessDistance = 0.0;
+        double indirectInterference = 0.0;
+
         for(int i = 0; i < agents.size(); i++){
-            current = (Patient) agents.get(i);
-            if(current.getInfected() && current != this){
+            alter = (Patient) agents.get(i);
+
+            if(alter != this){
                 Double2D one = city.yard.getObjectLocation(this);
-                Double2D other = city.yard.getObjectLocation(current);
-                cumulativeVector += (1 - city.getInfectiousness() * current.getAllVaccine())/(1 + distance(one,other));
+                Double2D other = city.yard.getObjectLocation(alter);
+
+                double denominator = 1 + distance(one,other);
+                int infected = alter.getInfected() ? 1:0;
+                int vaccine = alter.getVaccine() ? 1:0;
+
+                contagionDistance += infected / denominator;
+                infectiousnessDistance += vaccine / denominator;
+
+                // The indirect interference only occurs when alters are infected (Y == 1)
+                if(infected == 1) {
+                    indirectInterference += (infected * city.getContagion() -
+                            vaccine * city.getInfectiousness()) /
+                            denominator;
+                } else {
+                    indirectInterference += 0;
+                }
             }
         }
-        setIndirectInferference(cumulativeVector);
-        return cumulativeVector;
+
+        this.setContagionDistance(contagionDistance);
+        this.setInfectiousnessDistance(infectiousnessDistance);
+        this.setIndirectInferference(indirectInterference);
     }
 
-    /** COUNT NUMBER OF INFECTED
-     * At every step of the simulation is important to determine how many patients have the property infected
-     * equal to 1
-     * @param city to get the current state of the agents
-     * @return count of the number of patient whose state is infected
-     */
-
-    public int count_infected(City city){
+    // Count infected
+    public int countInfected(City city){
         Bag agents = city.peers.getAllNodes();
-        Patient current;
+        Patient alter;
         int count = 0;
         for(int i = 0; i < agents.size(); i++){
-            current = (Patient) agents.get(i);
-            if (current.getInfected()){
+            alter = (Patient) agents.get(i);
+            if (alter.getInfected()){
                 count++;
             }
         }
         return count;
     }
 
-    /** COUNT NUMBER OF VACCINATED
-     * At every step of the simulation is important to determine how many patients have the property vaccinated
-     * equal to 1
-     * @param city to get the current state of the agents
-     * @return count of the number of patient whose state is infected
-     */
-
-    public int count_vaccinated(City city){
+    // Count vaccinated
+    public int countVaccinated(City city){
         Bag agents = city.peers.getAllNodes();
-        Patient current;
+        Patient alter;
         int count = 0;
         for(int i = 0; i < agents.size(); i++){
-            current = (Patient) agents.get(i);
-            if (current.getVaccine()){
+            alter = (Patient) agents.get(i);
+            if (alter.getVaccine()){
                 count++;
             }
         }
         return count;
-    }
-
-    /** GET ALL SEX
-     * Method to get the information about the sex all agents
-     * @return is a list of the sex information
-     */
-    private int getAllSex(){
-        return this.getSex() ? 1:0;
-    }
-
-    /** GET ALL INFECTED
-     * Method to get the information about the infection of all agents
-     * @return is a list of the infection information
-     */
-    private int getAllInfected(){
-        return this.getInfected() ? 1:0;
-    }
-
-    /** GET ALL TREATMENT
-     * Method to get the information about the vaccine of all agents
-     * @return is a list of the vaccine information
-     */
-
-    private int getAllVaccine(){
-        return this.getVaccine() ? 1:0;
     }
 
     /** PROBABILITY OF CHANGING THE NETWORK
@@ -359,11 +334,11 @@ public class Patient implements Steppable {
      * 3. The outcome
      * @param city to get the pseudo-random number generator
      */
-    private void apply_vaccine(City city){
-        double rnd = city.random.nextDouble();
-        int confounding_sex = this.getSex() ? 1:0;
-        double apply_vaccine = (1 + city.getSexOnVaccine() * confounding_sex) * city.getProbVaccine();
-        if(rnd < apply_vaccine){
+    private void applyVaccine(City city){
+        int confoundingSex = this.getSex() ? 1:0;
+        double applyVaccine = (1 + city.getSexOnVaccine() * confoundingSex) * city.getProbVaccine();
+
+        if(city.random.nextDouble() < applyVaccine){
             setVaccine(true);
         }
     }
@@ -377,24 +352,26 @@ public class Patient implements Steppable {
      * 5. Cumulative distance of each patient to the infected patients
      * @param city to get the pseudo-random number generator
      */
-    private void apply_infection(City city){
-        double rnd = city.random.nextDouble();
-        int cause_sex = getAllSex();
-        int cause_vaccine = getAllVaccine();
-        int n_infected = count_infected(city);
-        double cum_distance = calculateCumDistance(city);
-        double transmission = city.getContagion()* n_infected / (1 + cum_distance);
-        double apply_infection = (1 + city.getSexOnInfection() * cause_sex -
-                city.getVaccineOnInfection()*cause_vaccine +
-                transmission) * city.getProbInfected();
-        if(rnd < apply_infection){
+    private void applyInfection(City city){
+
+        int sex = this.getSex() ? 1:0;
+        int vaccine = this.getVaccine() ? 1:0;
+
+
+        double applyInfection = (1 +
+                city.getSexOnInfection() * sex -
+                city.getVaccineOnInfection() * vaccine +
+                this.getIndirectInferference())
+                * city.getProbInfected();
+
+        if(city.random.nextDouble() < applyInfection){
             setInfected(true);
         }
     }
 
     /** EUCLIDEAN DISTANCE
      * To calculate the Euclidean distance between agents in the simulation
-     * @param one is the location of a current agent
+     * @param one is the location of a alter agent
      * @param other is the location of any other agent that will be iterated though a loop
      * @return the Euclidean distance
      */
@@ -420,15 +397,6 @@ public class Patient implements Steppable {
         }
         return 1 - result;
     }
-
-    /**
-     * def poissonPDF(x,lambdaa):
-     *     get = i = 0
-     *     while i < x:
-     *         get = get + f(i,lambdaa)
-     *         i = i + 1
-     *     return 1 - get
-     */
 
     /** POISSON FUNCTION
      * @param x point

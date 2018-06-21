@@ -145,8 +145,8 @@ public class GUI extends GUIState {
                 Patient patient = new Patient("name",city);
 
                 double x = city.schedule.getSteps();
-                double infected = patient.count_infected(city);
-                double vaccinated = patient.count_vaccinated(city);
+                double infected = patient.countInfected(city);
+                double vaccinated = patient.countVaccinated(city);
 
                 // ADD THE DATA
                 if (x >= state.schedule.EPOCH && x < state.schedule.AFTER_SIMULATION){
