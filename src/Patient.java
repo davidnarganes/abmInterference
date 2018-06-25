@@ -40,7 +40,6 @@ public class Patient implements Steppable {
     // LABEL TO DISPLAY IN SIM WHEN SELECTED
     public String toString(){
         return "[" + System.identityHashCode(this) +
-                "]\nCD:" + getContagionDistance() +
                 "\nInfected:" + getInfected() +
                 "\nVaccine:" + getVaccine() +
                 "\nSex:" + getSex() +
@@ -270,7 +269,7 @@ public class Patient implements Steppable {
                 contagionDistance += infected / denominator;
                 infectiousnessDistance += vaccine / denominator;
 
-                // The indirect interference only occurs when alters are infected (Y == 1)
+                // Infectiousness only occurs when alters are infected (Y == 1)
                 if(infected == 1) {
                     indirectInterference += (infected * city.getContagion() -
                             vaccine * city.getInfectiousness()) /
@@ -286,34 +285,6 @@ public class Patient implements Steppable {
         this.setIndirectInferference(indirectInterference);
     }
 
-    // Count infected
-    public int countInfected(City city){
-        Bag agents = city.peers.getAllNodes();
-        Patient alter;
-        int count = 0;
-        for(int i = 0; i < agents.size(); i++){
-            alter = (Patient) agents.get(i);
-            if (alter.getInfected()){
-                count++;
-            }
-        }
-        return count;
-    }
-
-    // Count vaccinated
-    public int countVaccinated(City city){
-        Bag agents = city.peers.getAllNodes();
-        Patient alter;
-        int count = 0;
-        for(int i = 0; i < agents.size(); i++){
-            alter = (Patient) agents.get(i);
-            if (alter.getVaccine()){
-                count++;
-            }
-        }
-        return count;
-    }
-
     /** PROBABILITY OF CHANGING THE NETWORK
      * At every step there will be a probability of changing the group of peers/enemies of each agent to ensure
      * that every patient has the probability of interacting with each other patient
@@ -327,7 +298,7 @@ public class Patient implements Steppable {
         actualiseDegree(city);
     }
 
-    /** GENERATE TREATMENTS
+    /** APPLY VACCINE
      * The probability of accessing the vaccine will just depend on:
      * 1. The Sex as confounder
      * 2. The basal probability of getting vaccine
@@ -335,15 +306,17 @@ public class Patient implements Steppable {
      * @param city to get the pseudo-random number generator
      */
     private void applyVaccine(City city){
-        int confoundingSex = this.getSex() ? 1:0;
-        double applyVaccine = (1 + city.getSexOnVaccine() * confoundingSex) * city.getProbVaccine();
+        int sex = this.getSex() ? 1:0;
+
+        // - sex to make the vaccination 'sexOnVaccine' times more likely
+        double applyVaccine = (1 - sex + city.getSexOnVaccine() * sex) * city.getProbVaccine();
 
         if(city.random.nextDouble() < applyVaccine){
             setVaccine(true);
         }
     }
 
-    /** GENERATE INFECTIONS
+    /** APPLY INFECTIONS
      * The probability of getting infected depends on:
      * 1. Sex value
      * 2. Treatment value
@@ -358,9 +331,11 @@ public class Patient implements Steppable {
         int vaccine = this.getVaccine() ? 1:0;
 
 
+        // - 1 * sex to make the infection 'sexOnVaccine' times more probable
+        // + 1 * vaccine to make infection exactly 'vaccineOnInfection' times more probable
         double applyInfection = (1 +
-                city.getSexOnInfection() * sex -
-                city.getVaccineOnInfection() * vaccine +
+                city.getSexOnInfection() * sex - sex -
+                city.getVaccineOnInfection() * vaccine + vaccine +
                 this.getIndirectInferference())
                 * city.getProbInfected();
 

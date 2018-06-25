@@ -1,5 +1,6 @@
 # Output data
 /R_scripts/plots/*
+.Rhistory
 
 # Python
 __pycache__/

@@ -27,9 +27,9 @@ public class FileParams {
     private ArrayList<Double> lambda;
     private ArrayList<Double> contagion;
     private ArrayList<Double> infectiousness;
-    private ArrayList<Integer> sexOnVaccine;
-    private ArrayList<Integer> sexOnInfection;
-    private ArrayList<Integer> vaccineOnInfection;
+    private ArrayList<Double> sexOnVaccine;
+    private ArrayList<Double> sexOnInfection;
+    private ArrayList<Double> vaccineOnInfection;
     private ArrayList<Double> promiscuityPopulation;
     private ArrayList<Double> maxPartnerForce;
     private ArrayList<Double> randomForce;
@@ -59,9 +59,9 @@ public class FileParams {
     public double getLambda(int index){return this.lambda.get(index);}
     public double getContagion(int index){return this.contagion.get(index);}
     public double getInfectiousness(int index){return this.infectiousness.get(index);}
-    public int getSexOnInfection(int index){return this.sexOnInfection.get(index);}
-    public int getSexOnVaccine(int index){return this.sexOnVaccine.get(index);}
-    public int getVaccineOnInfection(int index){return this.vaccineOnInfection.get(index);}
+    public double getSexOnInfection(int index){return this.sexOnInfection.get(index);}
+    public double getSexOnVaccine(int index){return this.sexOnVaccine.get(index);}
+    public double getVaccineOnInfection(int index){return this.vaccineOnInfection.get(index);}
     public double getPromiscuityPopulation(int index){return this.promiscuityPopulation.get(index);}
     public double getMaxPartnerForce(int index){return this.maxPartnerForce.get(index);}
     public double getRandomForce(int index){return this.randomForce.get(index);}
@@ -74,9 +74,9 @@ public class FileParams {
     public void addLambda(double value){this.lambda.add(value);}
     public void addContagion(double value){this.contagion.add(value);}
     public void addInfectiousness(double value){this.infectiousness.add(value);}
-    public void addSexOnInfection(int value){this.sexOnInfection.add(value);}
-    public void addSexOnVaccine(int value){this.sexOnVaccine.add(value);}
-    public void addVaccineOnInfection(int value){this.vaccineOnInfection.add(value);}
+    public void addSexOnInfection(double value){this.sexOnInfection.add(value);}
+    public void addSexOnVaccine(double value){this.sexOnVaccine.add(value);}
+    public void addVaccineOnInfection(double value){this.vaccineOnInfection.add(value);}
     public void addPromiscuityPopulation(double value){this.promiscuityPopulation.add(value);}
     public void addMaxPartnerForce(double value){this.maxPartnerForce.add(value);}
     public void addRandomForce(double value){this.randomForce.add(value);}

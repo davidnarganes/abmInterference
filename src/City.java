@@ -36,24 +36,25 @@ public class City extends SimState{
 
     // Default parameters
     private int numPatients = 200;
-    private double probInfected = 0.0001;
-    private double probVaccine = 0.0002;
+    private double probInfected = 0.001;
+    private double probVaccine = 0.001;
     private double lambda = 0.3;
-    private double contagion = 0.5;
-    private double infectiousness = 0.5;
-    private int sexOnVaccine = 3;
-    private int sexOnInfection = 3;
-    private int vaccineOnInfection = 3;
-    private double promiscuityPopulation = 0.01;
+    private double contagion = 3.0;
+    private double infectiousness = 3.0;
+    private double sexOnVaccine = 3.0;
+    private double sexOnInfection = 3.0;
+    private double vaccineOnInfection = 3.0;
+    private double promiscuityPopulation = 0.005;
     private double maxPartnerForce = 5.0;
     private double randomForce = 5.0;
     private double partnerForce = 3.0;
+    private String filenameHash;
 
     // Other variables
     private Scanner inputStream;
     private int lines = 0;
     private boolean multiSIM = true;
-    public int earlyGUIStop = 200;
+    public int earlyGUIStop = 300;
     private int numIntervals = 1;
     public Network peers = new Network(false);
 
@@ -68,10 +69,20 @@ public class City extends SimState{
         this.setProbInfected(probInfected);
         this.setProbVaccine(probVaccine);
         this.setContagion(contagion);
+        this.setInfectiousness(infectiousness);
         this.setSexOnVaccine(sexOnVaccine);
         this.setSexOnInfection(sexOnInfection);
         this.setVaccineOnInfection(vaccineOnInfection);
         this.setPromiscuityPopulation(promiscuityPopulation);
+        this.calculateFilenameHash();
+    }
+
+    public void calculateFilenameHash(){
+        // Define a unique hash for each file based on currentTimeMillis
+        String filename = (System.currentTimeMillis() + "time");
+
+        Integer filenameHash = filename.hashCode();
+        this.filenameHash = filenameHash.toString() + ".csv";
     }
 
     // Getters
@@ -81,13 +92,14 @@ public class City extends SimState{
     public double getLambda(){return lambda;}
     public double getContagion(){return contagion;}
     public double getInfectiousness(){return infectiousness;}
-    public int getSexOnVaccine(){return sexOnVaccine;}
-    public int getSexOnInfection(){return sexOnInfection;}
-    public int getVaccineOnInfection(){return vaccineOnInfection;}
+    public double getSexOnVaccine(){return sexOnVaccine;}
+    public double getSexOnInfection(){return sexOnInfection;}
+    public double getVaccineOnInfection(){return vaccineOnInfection;}
     public double getPromiscuityPopulation(){return promiscuityPopulation;}
     public double getMaxPartnerForce(){return maxPartnerForce;}
     public double getRandomForce(){return randomForce;}
     public double getPartnerForce(){return partnerForce;}
+    public String getFileNameHash(){return filenameHash.toString();}
     private int getLines(){return lines;}
 
     // Setters
@@ -97,27 +109,28 @@ public class City extends SimState{
     public void setLambda(double value){lambda = value;}
     public void setContagion(double value){contagion = value;}
     public void setInfectiousness(double value){infectiousness = value;}
-    public void setSexOnVaccine(int value){sexOnVaccine = value;}
-    public void setSexOnInfection(int value){sexOnInfection = value;}
-    public void setVaccineOnInfection(int value){vaccineOnInfection = value;}
+    public void setSexOnVaccine(double value){sexOnVaccine = value;}
+    public void setSexOnInfection(double value){sexOnInfection = value;}
+    public void setVaccineOnInfection(double value){vaccineOnInfection = value;}
     public void setPromiscuityPopulation(double value){promiscuityPopulation = value;}
     public void setMaxPartnerForce(double value){maxPartnerForce = value;}
     public void setRandomForce(double value){randomForce = value;}
     public void setPartnerForce(double value){partnerForce = value;}
+    public void setFilenameHash(){calculateFilenameHash();}
     private void setLines(int value){lines = value;}
 
-    // Domains
+    // Domains: slider in the GUI controler
     public Object domNumPatients(){return new Interval(1,3000);}
     public Object domProbInfected(){return new Interval(0.0,0.5);}
     public Object domProbVaccine(){return new Interval(0.0,0.5);}
     public Object domLambda(){return new Interval(0.0,50.0);}
     public Object domContagion(){return new Interval(0.0,20);}
     public Object domInfectiousness(){return new Interval(0.0,20);}
-    public Object domSexOnVaccine(){return new Interval(1,20);}
-    public Object domSexOnInfection(){return new Interval(1,20);}
-    public Object domVaccineOnInfection(){return new Interval(1,20);}
+    public Object domSexOnVaccine(){return new Interval(1.0,20.0);}
+    public Object domSexOnInfection(){return new Interval(1.0,20.0);}
+    public Object domVaccineOnInfection(){return new Interval(1.0,20.0);}
     public Object domPromiscuityPopulation(){return new Interval(0.0,1.0);}
-    public Object domMaxPartnerForce(){return new Interval(0.0,20.0);}
+    public Object domMaxPartnerForce(){return new Interval(0.0,this.getPartnerForce() * 1.5);}
     public Object domRandomForce(){return new Interval(0.0,20.0);}
     public Object domPartnerForce(){return new Interval(0.0,20.0);}
 
@@ -239,9 +252,9 @@ public class City extends SimState{
             fileParams.addLambda(Double.parseDouble(columns[i++]));
             fileParams.addContagion(Double.parseDouble(columns[i++]));
             fileParams.addInfectiousness(Double.parseDouble(columns[i++]));
-            fileParams.addSexOnInfection(Integer.parseInt(columns[i++]));
-            fileParams.addSexOnVaccine(Integer.parseInt(columns[i++]));
-            fileParams.addVaccineOnInfection(Integer.parseInt(columns[i++]));
+            fileParams.addSexOnInfection(Double.parseDouble(columns[i++]));
+            fileParams.addSexOnVaccine(Double.parseDouble(columns[i++]));
+            fileParams.addVaccineOnInfection(Double.parseDouble(columns[i++]));
             fileParams.addPromiscuityPopulation(Double.parseDouble(columns[i++]));
             fileParams.addMaxPartnerForce(Double.parseDouble(columns[i++]));
             fileParams.addRandomForce(Double.parseDouble(columns[i++]));
@@ -261,7 +274,7 @@ public class City extends SimState{
         boolean multiSIM;
 
         // State vars
-        state= new City(System.currentTimeMillis());
+        state = new City(System.currentTimeMillis());
         multiSIM = ((City) state).multiSIM;
 
         if (multiSIM){
@@ -271,20 +284,31 @@ public class City extends SimState{
             fileParams = ((City) state).readFile();
 
             for (int i = 0; i < ((City) state).getLines(); i++){
+                System.out.println("Executing SIM "+ i + "...");
 
-                // Define params of SIM at each iteration
+                // Define params of SIM at each iteration:
+                // 1. Get ALL params from fileParams
+                // 2. Set ALL params for current SIM
+
+                ((City) state).setNumPatients(fileParams.getNumPatients(i));
                 ((City) state).setProbInfected(fileParams.getProbInfected(i));
                 ((City) state).setProbVaccine(fileParams.getProbVaccine(i));
+                ((City) state).setLambda(fileParams.getLambda(i));
                 ((City) state).setContagion(fileParams.getContagion(i));
-                ((City) state).setContagion(fileParams.getInfectiousness(i));
+                ((City) state).setInfectiousness(fileParams.getInfectiousness(i));
                 ((City) state).setSexOnInfection(fileParams.getSexOnInfection(i));
                 ((City) state).setSexOnVaccine(fileParams.getSexOnVaccine(i));
                 ((City) state).setVaccineOnInfection(fileParams.getVaccineOnInfection(i));
                 ((City) state).setPromiscuityPopulation(fileParams.getPromiscuityPopulation(i));
+                ((City) state).setMaxPartnerForce(fileParams.getMaxPartnerForce(i));
+                ((City) state).setRandomForce(fileParams.getRandomForce(i));
+                ((City) state).setPartnerForce(fileParams.getPartnerForce(i));
+                ((City) state).setFilenameHash();
+
+                System.out.println("sexOnVaccine = " + ((City) state).getSexOnVaccine());
 
                 // RUN THE SIM
                 state.start();
-                System.out.println("Executing SIM "+ i + "...");
                 do {
                     if (!state.schedule.step(state)) break;
                 }

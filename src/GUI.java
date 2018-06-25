@@ -143,15 +143,27 @@ public class GUI extends GUIState {
             public void step(SimState state) {
                 City city = (City) state;
                 Patient patient = new Patient("name",city);
+                Bag peers = city.peers.getAllNodes();
+
+                int countInfected = 0;
+                int countVaccine = 0;
+
+                // count vaccinated and infected
+                for(int i = 0; i < peers.size(); i++){
+                    if (((Patient) peers.get(i)).getInfected()){
+                        countInfected++;
+                    } if (((Patient) peers.get(i)).getVaccine()) {
+                        countVaccine++;
+                    }
+
+                }
 
                 double x = city.schedule.getSteps();
-                double infected = patient.countInfected(city);
-                double vaccinated = patient.countVaccinated(city);
 
                 // ADD THE DATA
                 if (x >= state.schedule.EPOCH && x < state.schedule.AFTER_SIMULATION){
-                    numInfectedSeries.add(x,infected,false); // don't redraw data immediately
-                    numVaccinatedSeries.add(x,vaccinated,false);
+                    numInfectedSeries.add(x,countInfected,false); // don't redraw data immediately
+                    numVaccinatedSeries.add(x,countVaccine,false);
                     numInfectedVaccinatedChart.updateChartWithin(state.schedule.getSteps(),1000);
                 }
             }

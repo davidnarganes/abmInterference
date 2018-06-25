@@ -37,37 +37,11 @@ public class Utils implements Steppable {
         createDataFile(city);
     }
 
-    /** CREATE DATAFILE FOR MICRO-SIMULATION
-     * The columns of the data frame will be created at this point:
-     * 1. Step
-     * 2. Agent name
-     * 3. Sex
-     * 4. Treatment
-     * 5. Number of infected patients in the population
-     * 6. Cumulative infected distance
+    /** Create a datafile for the evolution of the SIM
      */
 
     private void createDataFile(City city) throws Exception {
         Writer writer = null;
-
-
-        // Generate a unique hash per file
-        String filename = (city.getNumPatients() + "," +
-                city.getProbInfected() + "," +
-                city.getProbVaccine() + "," +
-                city.getLambda() + "," +
-                city.getContagion() + "," +
-                city.getInfectiousness() + "," +
-                city.getSexOnInfection() + "," +
-                city.getSexOnVaccine() + "," +
-                city.getVaccineOnInfection() + "," +
-                city.getPromiscuityPopulation() + "," +
-                city.getMaxPartnerForce() + "," +
-                city.getRandomForce() + "," +
-                city.getPartnerForce() +
-                ".txt");
-
-        Integer filenameHash = filename.hashCode();
 
         File dir = new File(dirName);
         if (! dir.exists()){
@@ -76,25 +50,27 @@ public class Utils implements Steppable {
 
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(dirName + "/" + filenameHash.toString(), false),
+                    new FileOutputStream(dirName + "/" + city.getFileNameHash(), false),
                     "utf-8"));
 
             writer.write("numPatients=" + city.getNumPatients() + "," +
-                    "probInfected=" + city.getProbInfected() + ","  +
-                    "probVaccine=" + city.getProbVaccine() + ","  +
-                    "lambda=" + city.getLambda() + "," +
-                    "contagion=" + city.getContagion() + ","  +
-                    "sexOnInfection=" + city.getSexOnInfection() + ","  +
-                    "sexOnVaccine=" + city.getSexOnVaccine() + ","  +
-                    "vaccineOnInfection=" + city.getVaccineOnInfection() + ","  +
-                    "promiscuityPopulation=" + city.getPromiscuityPopulation() + ","  +
-                    "maxPartnerForce=" + city.getMaxPartnerForce() + "," +
-                    "randomForce=" + city.getRandomForce() + "," +
-                    "partnerForce=" + city.getPartnerForce()
+                            "probInfected=" + city.getProbInfected() + ","  +
+                            "probVaccine=" + city.getProbVaccine() + ","  +
+                            "lambda=" + city.getLambda() + "," +
+                            "contagion=" + city.getContagion() + ","  +
+                            "infectiousness=" + city.getInfectiousness() + ","  +
+                            "sexOnInfection=" + city.getSexOnInfection() + ","  +
+                            "sexOnVaccine=" + city.getSexOnVaccine() + ","  +
+                            "vaccineOnInfection=" + city.getVaccineOnInfection() + ","  +
+                            "promiscuityPopulation=" + city.getPromiscuityPopulation() + ","  +
+                            "maxPartnerForce=" + city.getMaxPartnerForce() + "," +
+                            "randomForce=" + city.getRandomForce() + "," +
+                            "partnerForce=" + city.getPartnerForce()
             );
             writer.write(System.getProperty("line.separator"));
-            writer.write("step,agent,sex,vaccine,infection,degree,contagionDist,infectiousnessDist,indInferference");
+            writer.write("step,agent,sex,vaccine,infection,degree,contagionDist,infectiousnessDist,indInterference");
             writer.write(System.getProperty("line.separator"));
+
         } catch (IOException ex){
             System.out.println("Error creating file");
         } finally {
@@ -115,29 +91,11 @@ public class Utils implements Steppable {
 
         long step = city.schedule.getSteps();
         Writer writer = null;
-
-        // Generate a unique hash per file
-        String filename = (city.getNumPatients() + "," +
-                city.getProbInfected() + "," +
-                city.getProbVaccine() + "," +
-                city.getLambda() + "," +
-                city.getContagion() + "," +
-                city.getInfectiousness() + "," +
-                city.getSexOnInfection() + "," +
-                city.getSexOnVaccine() + "," +
-                city.getVaccineOnInfection() + "," +
-                city.getPromiscuityPopulation() + "," +
-                city.getMaxPartnerForce() + "," +
-                city.getRandomForce() + "," +
-                city.getPartnerForce() +
-                ".txt");
-
-        Integer filenameHash = filename.hashCode();
         Patient patient;
 
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(dirName + "/" + filenameHash.toString(), true),
+                    new FileOutputStream(dirName + "/" + city.getFileNameHash(), true),
                     "utf-8")
             );
 
