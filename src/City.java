@@ -39,11 +39,11 @@ public class City extends SimState{
     private double probInfected = 0.001;
     private double probVaccine = 0.001;
     private double lambda = 0.3;
-    private double contagion = 3.0;
-    private double infectiousness = 3.0;
-    private double sexOnVaccine = 3.0;
-    private double sexOnInfection = 3.0;
-    private double vaccineOnInfection = 3.0;
+    private double contagion = 1.0;
+    private double infectiousness = 2.0;
+    private double sexOnVaccine = 2.0;
+    private double sexOnInfection = 2.0;
+    private double vaccineOnInfection = 2.0;
     private double promiscuityPopulation = 0.005;
     private double maxPartnerForce = 5.0;
     private double randomForce = 5.0;
@@ -170,7 +170,7 @@ public class City extends SimState{
         Bag agents = peers.getAllNodes();
         double[] distribution = new double[agents.numObjs];
         for(int i = 0; i < agents.numObjs; i++){
-            distribution[i] = ((Patient)(agents.objs[i])).getIndirectInferference();
+            distribution[i] = ((Patient)(agents.objs[i])).getIndirectInterference();
         }
         return distribution;
     }
@@ -258,7 +258,7 @@ public class City extends SimState{
             fileParams.addPromiscuityPopulation(Double.parseDouble(columns[i++]));
             fileParams.addMaxPartnerForce(Double.parseDouble(columns[i++]));
             fileParams.addRandomForce(Double.parseDouble(columns[i++]));
-            fileParams.addPartnerForce(Double.parseDouble(columns[i++]));
+            fileParams.addPartnerForce(Double.parseDouble(columns[i]));
             this.setLines(index++);
         }
 

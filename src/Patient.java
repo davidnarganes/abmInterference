@@ -34,7 +34,7 @@ public class Patient implements Steppable {
     private int degree;
     private double contagionDistance;
     private double infectiousnessDistance;
-    private double indirectInferference;
+    private double indirectInterference;
     private String name;
 
     // LABEL TO DISPLAY IN SIM WHEN SELECTED
@@ -58,7 +58,7 @@ public class Patient implements Steppable {
         this.setDegree(0);
         this.setContagionDistance(0.0);
         this.setInfectiousnessDistance(0.0);
-        this.setIndirectInferference(0.0);
+        this.setIndirectInterference(0.0);
     }
 
     // Setters
@@ -79,7 +79,7 @@ public class Patient implements Steppable {
         contagionDistance = value;
     }
     private void setInfectiousnessDistance(double value){infectiousnessDistance = value;}
-    private void setIndirectInferference(double value){indirectInferference = value;}
+    private void setIndirectInterference(double value){indirectInterference = value;}
 
     // Getters
     public boolean getSex(){
@@ -99,7 +99,7 @@ public class Patient implements Steppable {
         return contagionDistance;
     }
     public double getInfectiousnessDistance(){return infectiousnessDistance;}
-    public double getIndirectInferference(){return indirectInferference;}
+    public double getIndirectInterference(){return indirectInterference;}
 
     /** STEP METHOD
      * All the defined methods/functions will be applied here to be applied at each step of the simulation
@@ -282,7 +282,7 @@ public class Patient implements Steppable {
 
         this.setContagionDistance(contagionDistance);
         this.setInfectiousnessDistance(infectiousnessDistance);
-        this.setIndirectInferference(indirectInterference);
+        this.setIndirectInterference(indirectInterference);
     }
 
     /** PROBABILITY OF CHANGING THE NETWORK
@@ -336,7 +336,7 @@ public class Patient implements Steppable {
         double applyInfection = (1 +
                 city.getSexOnInfection() * sex - sex -
                 city.getVaccineOnInfection() * vaccine + vaccine +
-                this.getIndirectInferference())
+                this.getIndirectInterference())
                 * city.getProbInfected();
 
         if(city.random.nextDouble() < applyInfection){

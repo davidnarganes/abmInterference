@@ -111,7 +111,7 @@ public class Utils implements Steppable {
                         "," + patient.getDegree() +
                         "," + patient.getContagionDistance() +
                         "," + patient.getInfectiousnessDistance() +
-                        "," + patient.getIndirectInferference());
+                        "," + patient.getIndirectInterference());
 
                 writer.write(System.getProperty("line.separator"));
             }

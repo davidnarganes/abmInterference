@@ -5,13 +5,13 @@ install.packages("sandwich")
 install.packages("survey")
 
 # Load libraries
-Vlibrary(tableone)
+library(tableone)
 library(ipw)
 library(sandwich)
 library(survey)
 
 # Get directory, filename, and libraries
-fileName <- "SIM_output/0.001_0.001_0.5_0.5_3_3_3_0.1_1000.txt"
+fileName <- "output/970328296.csv"
 
 getFullFileName <- function(fileName){
   dirName <- dirname(rstudioapi::getSourceEditorContext()$path)
@@ -33,40 +33,26 @@ df = read.csv(textConnection(skip_first_line),
               stringsAsFactors = FALSE
               )
 
-dat1 <- df[df$step == 99,]
-dat0 <- df[df$step == 98,]
+dat1 <- df[df$step == 299,]
+dat0 <- df[df$step == 298,]
 
 # Simplify number of variables
 sex <- as.integer(as.logical(dat1$sex))
-treatment <- as.integer(as.logical(dat1$treatment))
+vaccine <- as.integer(as.logical(dat1$vaccine))
 infected <- as.integer(as.logical(dat1$outcome))
 
-# I have to account for all the past exposure per individual to the time point to work
-
-cd <- 0
-for (i in c(1:99)){
-  cd <- cd + (df[df$step == i,]$count_infected / (1 + df[df$step == i,]$cumulative_distance))
-  }
-summary(cd)
-
-# Standarise from 0 to 1 the vector
-range01 <- function(x){(x-min(x))/(max(x)-min(x))}
-cd2 <- range01(cd)
-summary(cd2)
-
 # Create dataframe and independent variables
-xvars <- c("treatment","sex","cd2")
-mydata <-as.data.frame(cbind(sex,treatment,cd2,infected))
+mydata <-as.data.frame(cbind(sex,vaccine,infected))
 
 # View table1 without weighting
-table1 <- CreateTableOne(vars = xvars,
-                         strata = "treatment", 
+table1 <- CreateTableOne(vars = "sex",
+                         strata = "vaccine", 
                          data = mydata,
                          test = TRUE)
 print(table1, smd = TRUE)
 
 # Propensity score model: propensity score per subject: has to be similar to causal weight
-psmodel <- glm(treatment ~ sex,  # sex is the only confounder for treatment
+psmodel <- glm(vaccine ~ sex,  # sex is the only confounder for vaccine
                family = binomial(link = 'logit')
                )
 summary(psmodel)
@@ -76,7 +62,7 @@ ps <- predict(psmodel,
               )
 
 # Create weights based on the inverse probabilities
-weight<-ifelse(treatment == 1,
+weight<-ifelse(vaccine == 1,
                1/(ps),
                1/(1-ps)
                )
@@ -89,7 +75,7 @@ weightedData<-svydesign(ids = ~ 1, # No clusters: ~0 or ~1 is a formula for no c
 
 # weighted table1
 weightedTable <- svyCreateTableOne(vars = c("sex","cd2"),
-                                   strata = "treatment", 
+                                   strata = "vaccine", 
                                    data = weightedData,
                                    test = TRUE)
 print(weightedTable, smd = TRUE)
@@ -104,7 +90,7 @@ asymptotic_var_estimator <- function(model, mode = 'logit'){
                   )
              )
   
-  # Make sure treatment is the second after intercept
+  # Make sure vaccine is the second after intercept
   if (mode == 'logit'){
     causal <- exp (beta[2])
     SD <- 1.96 * SE[2]
@@ -122,7 +108,7 @@ asymptotic_var_estimator <- function(model, mode = 'logit'){
 } 
 
 # get causal relative risk: weighted GLM
-model.obj <- glm(infected ~ treatment + sex + cd2,
+model.obj <- glm(infected ~ vaccine + sex + cd2,
                    weights = weight,
                    family = binomial(link = 'logit')
                    )
@@ -131,7 +117,7 @@ asymptotic_var_estimator(model.obj, mode = 'logit')
 
 
 ## What about the risk difference?
-model.obj <- glm(infected ~ treatment + sex + cd2,
+model.obj <- glm(infected ~ vaccine + sex + cd2,
                    weights = weight,
                    family = binomial(link = 'identity')
 )
@@ -143,7 +129,7 @@ asymptotic_var_estimator(model.obj, mode = 'linear')
 #############################
 
 # Propensity score model alternative
-ipw_model <- ipwpoint(exposure = treatment, # Get weights when predicting treatment
+ipw_model <- ipwpoint(exposure = vaccine, # Get weights when predicting vaccine
                       family = 'binomial',
                       link = 'logit',
                       denominator = ~ sex, # just the sex is a confounder
@@ -162,7 +148,7 @@ ipwplot(weights = weigths_ipw,
         )
 
 #fit a marginal structural model (risk difference, RD)
-msm <- (svyglm(infected ~ treatment + sex + cd2,
+msm <- (svyglm(infected ~ vaccine + sex + cd2,
                design = svydesign(ids = ~ 1,
                                   weights = ~weigths_ipw,
                                   data = mydata
